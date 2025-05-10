@@ -5,36 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
+      
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            background: linear-gradient(-45deg, #74ebd5, #ACB6E5, #fbc2eb, #a6c1ee);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .login-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 90%;
+            max-width: 350px;
+            padding: 40px 30px;
+            animation: fadeInUp 1s ease both;
         }
-        input, button {
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        input {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #000000;
+            outline: none;
+            width: 93%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        button {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
             border: none;
-            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
         }
+
         button:hover {
-            background-color: #218838;
+            background-color: #f68104;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 10px;
+            color: #ffb3b3;
+        }
+
+        @media (max-width: 400px) {
+            .login-container {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
@@ -43,44 +106,46 @@
     <div class="login-container">
         <h2>Login</h2>
         <form id="loginForm">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
             <button type="submit">Login</button>
         </form>
-        <p id="message" style="color: red;"></p>
+        <p id="message"></p>
     </div>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            let email = document.getElementById('email').value;
-            let password = document.getElementById('password').value;
-            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('message');
+
             try {
-                let response = await fetch('http://127.0.0.1:8000/api/login', { // Change to your actual API URL
+                const response = await fetch('http://127.0.0.1:8000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
+                    body: JSON.stringify({ email, password })
                 });
 
-                let data = await response.json();
-                
+                const data = await response.json();
+
                 if (response.ok) {
                     alert('Login Successful!');
-                    localStorage.setItem('token', data.token); // Save token for authentication
-                    window.location.href = 'dashboard.html'; // Redirect to a dashboard
+                    localStorage.setItem('token', data.token);
+                    window.location.href = 'dashboard.html';
                 } else {
-                    document.getElementById('message').innerText = data.message || 'Login failed';
+                    messageEl.innerText = data.message || 'Login failed';
                 }
-            } catch (error) {
-                document.getElementById('message').innerText = 'Error connecting to server';
+            } catch (err) {
+                messageEl.innerText = 'Error connecting to server';
             }
         });
     </script>
