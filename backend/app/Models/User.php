@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Student;
+use App\Models\Role;
 
 class User extends Authenticatable
 {
+    protected $table = "users";
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens ;
 
@@ -19,8 +22,8 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'profile_image',
+        'role',
         'email',
         'password',
     ];
@@ -46,5 +49,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function role(){
+        
+        return $this->belongsTo(Role::class);
+    }
+
+    public function student(){
+        
+        return $this->hasOne(Student::class);
     }
 }

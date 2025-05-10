@@ -6,6 +6,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -21,16 +22,15 @@ class StudentController extends Controller
 
    
 
-    public function store(Request $request): JsonResponse
-    {
-        try {
+   public function store(Request $request): JsonResponse
+{
+    try {
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'age' => 'required|integer|min:1',
-            'gender' => 'required|in:Male,Female,other',
+            'gender' => 'required|in:Male,Female,male,female',
             'address' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
             'course' => 'required|string|max:255',
             'contact_number' => 'required|string|max:15',
         ]);
@@ -39,21 +39,28 @@ class StudentController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        
-        $student = Student::create($request->all());
+        $data = $validator->validated();
+
+        // user_id if user who logged in
+        if (Auth::check()) {
+            $data['user_id'] = Auth::id();
+        }
+
+        $student = Student::create($data);
 
         return response()->json([
-            'status' => true, 
-            'message' => 'Student created successfully', 
+            'status' => true,
+            'message' => 'Student created successfully',
             'student' => $student
-         ],201);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
+        ], 201);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Display the specified resource.
@@ -99,7 +106,6 @@ class StudentController extends Controller
             'last_name' => 'string|max:255',
             'age' => 'integer',
             'gender' => 'string',
-            'email' => 'email|unique:students,email,' . $student->id, // Correct table name
             'course' => 'string|max:255', // Adjusted field to match Student model
             'contact_number' => 'string|max:15', // Adjusted field to match Student model
         ]);

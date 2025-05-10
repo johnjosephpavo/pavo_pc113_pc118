@@ -28,8 +28,8 @@ class AuthController extends Controller
     {
         try {
             $validateUser = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
+                'role' => 'required|string|max:2',
                 'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
                 'password' => 'required|string|min:6',
             ]);
@@ -53,8 +53,8 @@ class AuthController extends Controller
     
             // Create user
             $user = User::create([
-                'name' => $request->name,
                 'email' => $request->email,
+                'role' => $request->role,
                 'profile_image' => $filename,
                 'password' => Hash::make($request->password),
             ]);
@@ -82,8 +82,8 @@ class AuthController extends Controller
             $user = User::findOrFail($id);
     
             $validateUser = Validator::make($request->all(), [
-                'name' => 'nullable|string|max:255',
                 'email' => 'nullable|email|unique:users,email,' . $user->id,
+                'role' => 'nullable|exists:roles,id',
                 'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:10048',
                 'password' => 'nullable|string|min:6',
             ]);
@@ -98,12 +98,12 @@ class AuthController extends Controller
     
             $updateData = [];
     
-            if ($request->filled('name')) {
-                $updateData['name'] = $request->name;
-            }
-    
             if ($request->filled('email')) {
                 $updateData['email'] = $request->email;
+            }
+
+            if ($request->filled('role')) {
+                $updateData['role'] = $request->role;
             }
     
             if ($request->filled('password')) {
@@ -159,13 +159,11 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
         ]);
