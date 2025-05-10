@@ -218,9 +218,10 @@
                               <caption>Users Table</caption>
                               <thead>
                                   <tr>
-                                      <th>Name</th>
-                                      <th class="col-email">Email</th>
-                                      <th>Action</th>
+                                      <th class="col">ID</th>
+                                      <th class="col">Email</th>
+                                      <th class="col">Role</th>
+                                      <th class="col">Action</th>
                                   </tr>
                               </thead>
                               <tbody id="studentsTable">
@@ -251,13 +252,17 @@
               </div> 
   
               <div class="form-group">
-                  <label for="name">Name</label>
-                  <input type="text" class="form-control" id="name" required>
-              </div>
-  
-              <div class="form-group">
                   <label for="email">Email</label>
                   <input type="email" class="form-control" id="email" required>
+              </div>
+
+              <div class="form-group">
+                            <label for="inputEmail4">Role</label>
+                            <select name="role" id="role" class="form-control">
+                                <option value="" selected disabled>Select a Role</option>
+                                <option value="1">Admin</option>
+                                <option value="2">Student</option>
+                            </select>
               </div>
   
               <div class="form-group">
@@ -282,24 +287,27 @@
               <input type="hidden" id="edit_user_id">
     
               <div class="form-group">
-                  <label for="edit_name">Name</label>
-                  <input type="text" class="form-control" id="edit_name" required>
+                  <label for="profile_image">Profile Image</label>
+                  <input type="file" class="form-control" id="edit_profile_image" name="profile_image" accept="image/*">
               </div>
-    
-              <div class="form-group">
-                  <label for="edit_profile_image">Profile Image</label>
-                  <input type="file" class="form-control" id="edit_profile_image" name="edit_profile_image" accept="image/*">
-              </div>
-    
     
               <div class="form-group">
                   <label for="edit_email">Email</label>
-                  <input type="email" class="form-control" id="edit_email" required>
+                  <input type="email" class="form-control" id="edit_email">
+              </div>
+
+              <div class="form-group">
+                            <label for="inputEmail4">Role</label>
+                            <select name="role" id="edit_role" class="form-control">
+                                <option value="" select disabled >Select a Role</option>
+                                <option value="1">Admin</option>
+                                <option value="2">Student</option>
+                            </select>
               </div>
               
               <div class="form-group">
-                <label for="edit_password">Password</label>
-                <input type="password" class="form-control" id="edit_password" required>
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="edit_password">
               </div>
 
               <button type="submit" class="btn btn-success">Update User</button>
@@ -446,6 +454,7 @@
  <script async defer src="https://buttons.github.io/buttons.js"></script>
  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
  <script src="../frontend/soft-ui-dashboard.js"></script>
+ <!-- Logout Remove Token -->
  <script>
    function logout(){
       localStorage.removeItem('token');
@@ -480,10 +489,26 @@
         .then(users => {
             for (let i = 0; i < users.length; i++) {
                 if (users[i].id === currentUser.id) continue;
+                
+                // Mapping using switch case //
+                let roleName = '';
+                switch(users[i].role){
+                    case '1':
+                        case 1:
+                            roleName = 'Admin';
+                            break;
+                    case '2':
+                        case 2:
+                            roleName = 'Student';
+                            break;
+                    default:
+                            roleName = 'Unknown';
+                }
 
                 const row = "<tr>" +
-                    "<td>" + users[i].name + "</td>" +
+                    "<td>" + users[i].id + "</td>" +
                     "<td>" + users[i].email + "</td>" +
+                     "<td><span class='badge " + (roleName === 'Admin' ? 'bg-primary' : 'bg-warning') + "'>" + roleName + "</span></td>" +
                     "<td>" +
                       `<button id='showEditFormButton' class='showEditFormButton btn btn-warning btn-sm' data-id="${users[i].id}" title='Edit Button'><i class='fa fa-solid fa-edit'></i> Edit</button>` +
                       `<a class='deleteUser btn btn-danger btn-sm' data-user-id='${users[i].id}' title='Delete Button'><i class='fa fa-solid fa-trash'></i> Delete</a>` +
@@ -590,8 +615,8 @@
           event.preventDefault();
   
           let formData = new FormData();
-          formData.append('name', document.getElementById('name').value);
           formData.append('email', document.getElementById('email').value);
+          formData.append('role', document.getElementById('role').value);
           formData.append('password', document.getElementById('password').value);
   
           let profileImageInput = document.getElementById('profile_image');
@@ -613,12 +638,12 @@
               console.log('Parsed JSON:', res);
   
               if (res.status) {
-                  // ✅ Show success message
+                  // Show success message
                   messageDiv.classList.remove('d-none', 'alert-danger');
                   messageDiv.classList.add('alert', 'alert-success');
                   messageDiv.innerText = "User created successfully!";
   
-                  // ✅ Hide the form with fade-out effect
+                  // Hide the form with fade-out effect
                   formContainer.style.transition = "opacity 0.5s ease";
                   formContainer.style.opacity = 0;
   
@@ -678,8 +703,8 @@
           }
           
           // Populate form fields with the fetched user data
-          document.getElementById("edit_name").value = data.user.name;
           document.getElementById("edit_email").value = data.user.email;
+          document.getElementById("edit_role").value = data.user.role;
   
           // Show form
           formContainer.style.display = "block";
@@ -713,13 +738,14 @@
 
         const userId = document.getElementById("edit_user_id").value;  // Get the user ID from the form
         const formData = new FormData();
-        formData.append('edit_name', document.getElementById("edit_name").value);  // Name field
-        formData.append('edit_email', document.getElementById("edit_email").value);  // Email field
+        formData.append('email', document.getElementById("edit_email").value);  // Email field
+        formData.append('role', document.getElementById("edit_role").value);  // Role field
+        formData.append('password', document.getElementById("edit_password").value);  // Password field
         
         // Handle Profile Image upload
         const profileImage = document.getElementById("edit_profile_image").files[0];
         if (profileImage) {
-            formData.append('edit_profile_image', profileImage);
+            formData.append('profile_image', profileImage);
         }
         formData.append('_method', 'PUT');  // Laravel needs this to treat it as a PUT request
 
