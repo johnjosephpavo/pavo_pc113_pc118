@@ -224,7 +224,7 @@
                                       <th class="col">Action</th>
                                   </tr>
                               </thead>
-                              <tbody id="studentsTable">
+                              <tbody>
                                  
                               </tbody>
                           </table>
@@ -264,7 +264,53 @@
                                 <option value="2">Student</option>
                             </select>
               </div>
-  
+
+              <!-- Role Fiels -->
+              <div id="studentFields" style="display: none;">
+                  <div class="form-group">
+                      <label>First Name</label>
+                      <input type="text" class="form-control" id="first_name" name="first_name">
+                  </div>
+                  <div class="form-group">
+                      <label>Last Name</label>
+                      <input type="text" class="form-control" id="last_name" name="last_name">
+                  </div>
+                  <div class="form-group">
+                      <label>Age</label>
+                      <input type="text" class="form-control" id="age" name="age">
+                  </div>
+                  <div class="form-group">
+                      <label>Gender</label>
+                      <select class="form-control" id="gender" name="gender">
+                          <option value="" disabled selected>Select</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>Address</label>
+                      <textarea class="form-control" id="address" name="address"></textarea>
+                  </div>
+                   <div class="form-group">
+                            <label for="inputEmail4">Course</label>
+                            <select name="course" id="course" class="form-control">
+                              <option value="" selected disabled>Select a Course</option>
+                              <option value="BSIT">BSIT</option>
+                              <option value="BSCS">BSCS</option>
+                              <option value="BSBA">BSBA</option>
+                              <option value="BEED">BEED</option>
+                              <option value="BSED">BSED</option>
+                              <option value="BSED-Math">BSED-Math</option>
+                              <option value="BSN">BSN</option>
+                            </select>
+                </div>
+                  <div class="form-group">
+                      <label>Contact Number</label>
+                      <input type="text" class="form-control" id="contact_number" name="contact_number">
+                  </div>
+              </div>
+              <!-- End of Role Fields -->
+
               <div class="form-group">
                   <label for="password">Password</label>
                   <input type="password" class="form-control" id="password" required>
@@ -304,6 +350,52 @@
                                 <option value="2">Student</option>
                             </select>
               </div>
+
+              <!-- Role  Edit Fiels -->
+              <div id="studentEditFields">
+                  <div class="form-group">
+                      <label>First Name</label>
+                      <input type="text" class="form-control" id="edit_first_name" name="first_name">
+                  </div>
+                  <div class="form-group">
+                      <label>Last Name</label>
+                      <input type="text" class="form-control" id="edit_last_name" name="last_name">
+                  </div>
+                  <div class="form-group">
+                      <label>Age</label>
+                      <input type="text" class="form-control" id="edit_age" name="age">
+                  </div>
+                  <div class="form-group">
+                      <label>Gender</label>
+                      <select class="form-control" id="edit_gender" name="gender">
+                          <option value="" disabled selected>Select</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>Address</label>
+                      <textarea class="form-control" id="edit_address" name="address"></textarea>
+                  </div>
+                   <div class="form-group">
+                            <label for="inputEmail4">Course</label>
+                            <select name="course" id="edit_course" class="form-control">
+                              <option value="" selected disabled>Select a Course</option>
+                              <option value="BSIT">BSIT</option>
+                              <option value="BSCS">BSCS</option>
+                              <option value="BSBA">BSBA</option>
+                              <option value="BEED">BEED</option>
+                              <option value="BSED">BSED</option>
+                              <option value="BSED-Math">BSED-Math</option>
+                              <option value="BSN">BSN</option>
+                            </select>
+                </div>
+                  <div class="form-group">
+                      <label>Contact Number</label>
+                      <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
+                  </div>
+              </div>
+              <!-- End of Edit Role Fields -->
               
               <div class="form-group">
                 <label for="password">Password</label>
@@ -462,6 +554,27 @@
   }
  </script>
 
+<!-- Contact Number limit to 11 in create -->
+<script>
+        document.getElementById('contact_number').addEventListener('input', function(event) {
+            let input = event.target;
+            let value = input.value;
+            if (value.length > 11) {
+                input.value = value.slice(0, 11); 
+            }
+        });    
+</script>
+<!-- Contact Number limit to 11 in edit -->
+<script>
+        document.getElementById('edit_contact_number').addEventListener('input', function(event) {
+            let input = event.target;
+            let value = input.value;
+            if (value.length > 11) {
+                input.value = value.slice(0, 11); 
+            }
+        });    
+</script>
+
 <!-- Showing the list of all the users -->
  <script>
       function getCurrentUser() {
@@ -510,7 +623,7 @@
                     "<td>" + users[i].email + "</td>" +
                      "<td><span class='badge " + (roleName === 'Admin' ? 'bg-primary' : 'bg-warning') + "'>" + roleName + "</span></td>" +
                     "<td>" +
-                      `<button id='showEditFormButton' class='showEditFormButton btn btn-warning btn-sm' data-id="${users[i].id}" title='Edit Button'><i class='fa fa-solid fa-edit'></i> Edit</button>` +
+                      `<button id='showEditFormButton' class='showEditFormButton btn btn-warning btn-sm me-2' data-id="${users[i].id}" title='Edit Button'><i class='fa fa-solid fa-edit'></i> Edit</button>` +
                       `<a class='deleteUser btn btn-danger btn-sm' data-user-id='${users[i].id}' title='Delete Button'><i class='fa fa-solid fa-trash'></i> Delete</a>` +
                     "</td>" +
                 "</tr>";
@@ -602,6 +715,20 @@
 </script>
 <!-- End of form in create User-->
 
+<!-- Show Role fields if the role is 2 in Create User-->
+<script>
+  document.getElementById('role').addEventListener('change', function () {
+    const studentFields = document.getElementById('studentFields');
+    if (this.value === '2') {
+        studentFields.style.display = 'block';
+    } else {
+        studentFields.style.display = 'none';
+    }
+});
+
+</script>
+<!-- End of Show Role fields if the role is 2 in Create User-->
+
 <!-- Script for submitting the form in users create -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -609,7 +736,7 @@
       const formContainer = document.getElementById('showCreateForm');
       const messageDiv = document.getElementById('alertMessage');
   
-      console.log('Form found:', form);
+      // console.log('Form found:', form);
   
       form.addEventListener('submit', function (event) {
           event.preventDefault();
@@ -618,11 +745,25 @@
           formData.append('email', document.getElementById('email').value);
           formData.append('role', document.getElementById('role').value);
           formData.append('password', document.getElementById('password').value);
-  
+
           let profileImageInput = document.getElementById('profile_image');
           if (profileImageInput.files.length > 0) {
               formData.append('profile_image', profileImageInput.files[0]);
           }
+
+          // If role is 2 which is student //
+          const role = document.getElementById('role').value;
+          formData.append('role', role);
+
+          if (role === '2') {
+          formData.append('first_name', document.getElementById('first_name').value);
+          formData.append('last_name', document.getElementById('last_name').value);
+          formData.append('age', document.getElementById('age').value);
+          formData.append('gender', document.getElementById('gender').value);
+          formData.append('address', document.getElementById('address').value);
+          formData.append('course', document.getElementById('course').value);
+          formData.append('contact_number', document.getElementById('contact_number').value);
+      }
   
           fetch('http://127.0.0.1:8000/api/createusers', {
               method: 'POST',
@@ -670,14 +811,23 @@
 </script>
 <!-- End of Script for submitting the form in users create -->
 
-
-<!-- Show the form in edit User-->
+<!-- Show the form in edit User also for submitting the form in users edit -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const formContainer = document.getElementById("showEditForm");
     const cancelEditButton = document.getElementById("cancelEditButton");
     const alertMessage = document.getElementById("alertMessage");
-  
+    
+    //  if role is 2 //
+    function toggleStudentFields(role) {
+      const studentFields = document.getElementById("studentEditFields");
+      if (role === 2) {
+        studentFields.style.display = "block";
+      } else {
+        studentFields.style.display = "none";
+      }
+    }
+
     // EVENT: Show Edit Form
     document.addEventListener("click", function (event) {
       const button = event.target.closest(".showEditFormButton");
@@ -705,12 +855,30 @@
           // Populate form fields with the fetched user data
           document.getElementById("edit_email").value = data.user.email;
           document.getElementById("edit_role").value = data.user.role;
-  
+          toggleStudentFields(data.user.role);  // This will show based on the role
+          
+          if (data.user.role === 2 && data.student) {
+            toggleStudentFields(2);
+            document.getElementById("edit_first_name").value = data.student.first_name || "";
+            document.getElementById("edit_last_name").value = data.student.last_name || "";
+            document.getElementById("edit_age").value = data.student.age || "";
+            document.getElementById("edit_gender").value = data.student.gender || "";
+            document.getElementById("edit_address").value = data.student.address || "";
+            document.getElementById("edit_course").value = data.student.course || "";
+            document.getElementById("edit_contact_number").value = data.student.contact_number || "";
+          } else {
+            toggleStudentFields(1); // Hide student fields for Admin
+          }
+
           // Show form
           formContainer.style.display = "block";
           formContainer.style.opacity = 0;
           formContainer.style.transition = "opacity 0.5s ease";
           setTimeout(() => formContainer.style.opacity = 1, 10);
+          document.getElementById("edit_role").addEventListener("change", function () {
+            toggleStudentFields(this.value);
+          });
+
         })
         .catch(error => {
           console.error("Fetch error:", error);
@@ -737,9 +905,11 @@
         alertMessage.classList.add('d-none');  // Hide previous messages
 
         const userId = document.getElementById("edit_user_id").value;  // Get the user ID from the form
+        const role = parseInt(document.getElementById("edit_role").value);
         const formData = new FormData();
+
         formData.append('email', document.getElementById("edit_email").value);  // Email field
-        formData.append('role', document.getElementById("edit_role").value);  // Role field
+        formData.append('role', role);  // Role field
         formData.append('password', document.getElementById("edit_password").value);  // Password field
         
         // Handle Profile Image upload
@@ -747,6 +917,18 @@
         if (profileImage) {
             formData.append('profile_image', profileImage);
         }
+
+        // Append student-specific fields if role is 2
+        if (role === 2) {
+            formData.append('first_name', document.getElementById("edit_first_name").value);
+            formData.append('last_name', document.getElementById("edit_last_name").value);
+            formData.append('age', document.getElementById("edit_age").value);
+            formData.append('gender', document.getElementById("edit_gender").value);
+            formData.append('address', document.getElementById("edit_address").value);
+            formData.append('course', document.getElementById("edit_course").value);
+            formData.append('contact_number', document.getElementById("edit_contact_number").value);
+        }
+
         formData.append('_method', 'PUT');  // Laravel needs this to treat it as a PUT request
 
         // Send form data using fetch
@@ -781,6 +963,9 @@
   });
 </script>
 <!-- End of Script for submitting the form in users edit -->
+
+
+
 
 </body>
 
