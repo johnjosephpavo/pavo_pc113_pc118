@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -26,78 +27,84 @@ class AuthController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $validateUser = Validator::make($request->all(), [
-                'email' => 'required|email|unique:users,email',
-                'role' => 'required|string|max:2',
-                'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-                'password' => 'required|string|min:6',
-            ]);
-    
-            if ($validateUser->fails()) {
+        $validated = $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|integer',
+            'profile_image' => 'nullable|image|max:2048',
+        ]); 
+
+        // Upload profile image if present
+        if ($request->hasFile('profile_image')) {
+            $filename = time() . '.' . $request->file('profile_image')->getClientOriginalExtension();
+            $path = $request->file('profile_image')->storeAs('profile_images', $filename, 'public');
+            $validated['profile_image'] = $path;
+        }
+
+        $validated['password'] = bcrypt($validated['password']);
+
+        $user = User::create($validated);
+
+        // If role is 2 (Student), also create a Student record
+        if ((int) $user->role === 2) {
+            try {
+                Student::create([
+                    'user_id' => $user->id,
+                    'first_name' => $request->input('first_name', ''),
+                    'last_name' => $request->input('last_name', ''),
+                    'age' => $request->input('age', null),
+                    'gender' => $request->input('gender', ''),
+                    'address' => $request->input('address', ''),
+                    'course' => $request->input('course', ''),
+                    'contact_number' => $request->input('contact_number', ''),
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create student:', ['error' => $e->getMessage()]);
                 return response()->json([
                     'status' => false,
-                    'message' => 'Create Failed!',
-                    'errors' => $validateUser->errors()
-                ], 422);
+                    'message' => 'User created, but failed to create in student table: ' . $e->getMessage(),
+                ], 500);
             }
-    
-            // Handle profile image upload
-            $filename = null;
-            if ($request->hasFile('profile_image')) {
-                $image = $request->file('profile_image');
-                $filename = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('images'), $filename);
-            }
-            $imageUrl = $filename ? url('images/' . $filename) : null;
-    
-            // Create user
-            $user = User::create([
-                'email' => $request->email,
-                'role' => $request->role,
-                'profile_image' => $filename,
-                'password' => Hash::make($request->password),
-            ]);
-    
-            // Disable cache for the response
-            return response()->json([
-                'status' => true,
-                'message' => 'User Created Successfully',
-                'image_url' => $imageUrl,
-                'user' => $user,
-            ], 201)->header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Server Error: ' . $th->getMessage()
-            ], 500);
         }
-    }
-    
 
+        return response()->json([
+            'status' => true,
+            'message' => 'User created successfully',
+        ]);
+    }
 
     public function updateUser(Request $request, $id)
     {
         try {
+            Log::info("Update attempt for User ID: {$id}");
+
             $user = User::findOrFail($id);
-    
+
+            // Log user info before updating
+            Log::info("User fetched: ", $user->toArray());
+
             $validateUser = Validator::make($request->all(), [
                 'email' => 'nullable|email|unique:users,email,' . $user->id,
                 'role' => 'nullable|exists:roles,id',
                 'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:10048',
                 'password' => 'nullable|string|min:6',
             ]);
-    
+
             if ($validateUser->fails()) {
+                Log::error("Validation failed for User ID: {$id}", $validateUser->errors()->toArray());
                 return response()->json([
                     'status' => false,
                     'message' => 'Update Failed!',
                     'errors' => $validateUser->errors()
                 ], 422);
             }
-    
+
             $updateData = [];
-    
+            $previousRole = $user->role;
+
+            // Log role before update
+            Log::info("Previous role: {$previousRole}");
+
             if ($request->filled('email')) {
                 $updateData['email'] = $request->email;
             }
@@ -105,43 +112,96 @@ class AuthController extends Controller
             if ($request->filled('role')) {
                 $updateData['role'] = $request->role;
             }
-    
+
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
-    
-            // Handle profile image upload
+
+            // Profile image handling
             if ($request->hasFile('profile_image')) {
                 $image = $request->file('profile_image');
                 $filename = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('images'), $filename);
-    
-                // Delete old image if exists
+
                 if ($user->profile_image && file_exists(public_path('images/' . $user->profile_image))) {
                     unlink(public_path('images/' . $user->profile_image));
                 }
-    
+
                 $updateData['profile_image'] = $filename;
             }
-    
-            // Apply updates
+
+            // Log the data to be updated
+            Log::info("Update data: ", $updateData);
+
+            // Update user record
             $user->update($updateData);
-    
+
+            // Log the user after update
+            Log::info("User after update: ", $user->toArray());
+
+            $newRole = $updateData['role'] ?? $previousRole;
+
+            // Handle role change
+            if ($previousRole != 2 && $newRole == 2) {
+                Student::create([
+                    'user_id' => $user->id,
+                    'first_name' => '',
+                    'last_name' => '',
+                    'age' => null,
+                    'gender' => '',
+                    'address' => '',
+                    'course' => '',
+                    'contact_number' => '',
+                ]);
+                Log::info("New student record created for User ID: {$user->id}");
+            }
+
+            if ($previousRole == 2 && $newRole != 2) {
+                Student::where('user_id', $user->id)->delete();
+                Log::info("Student record deleted for User ID: {$user->id}");
+            }
+
+            // Update student details if still a student
+            if ($newRole == 2) {
+                try {
+                    $student = Student::where('user_id', $user->id)->first();
+                    if ($student) {
+                        $student->update([
+                            'first_name' => $request->input('first_name', $student->first_name),
+                            'last_name' => $request->input('last_name', $student->last_name),
+                            'age' => $request->input('age', $student->age),
+                            'gender' => $request->input('gender', $student->gender),
+                            'address' => $request->input('address', $student->address),
+                            'course' => $request->input('course', $student->course),
+                            'contact_number' => $request->input('contact_number', $student->contact_number),
+                        ]);
+                        Log::info("Student record updated for User ID: {$user->id}");
+                    }
+                } catch (\Throwable $e) {
+                    Log::error("Error updating student data for User ID: {$user->id}", ['error' => $e->getMessage()]);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'User updated but student data failed: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+
+            Log::info("User update successful for User ID: {$user->id}");
+
             return response()->json([
                 'status' => true,
                 'message' => 'User Updated Successfully',
                 'user' => $user
             ], 200);
-    
+
         } catch (\Throwable $th) {
+            Log::error("Error in updating user: {$th->getMessage()}");
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
     }
-    
-
 
     public function edit($id)
     {
@@ -153,8 +213,6 @@ class AuthController extends Controller
     
         return response()->json($user, 200);
     }
-
-
 
     public function register(Request $request)
     {
@@ -179,23 +237,22 @@ class AuthController extends Controller
    
     public function getUserById($id)
     {
-        $user = User::find($id); // find() returns null if not found
-    
+        $user = User::with('student')->find($id); // Eager load the related student data
+
         if (!$user) {
             return response()->json([
                 'status' => false,
                 'message' => 'User not found'
             ], 404);
         }
-    
+
         return response()->json([
             'status' => true,
-            'user' => $user,
+            'user' => $user,              // includes base user info
+            'student' => $user->student   // nullable if not a student
         ], 200);
     }
-    
 
-  
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();

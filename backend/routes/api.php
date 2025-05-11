@@ -17,25 +17,26 @@ use App\Http\Controllers\EmployeeController;
     Route::post('/login', [AuthController::class, 'login']);
 
 
-    // Users //
+    
     Route::middleware('auth:sanctum')->group(function(){ 
         
-    Route::get('/usersList', [AuthController::class, 'list']); 
-    Route::post('/createusers', [AuthController::class, 'store']);
-    Route::get('/get/users/{id}', [AuthController::class, 'edit']);
-    Route::get('/getUserById/{id}', [AuthController::class, 'getUserById']);
-    Route::put('/update/users/{id}', [AuthController::class, 'updateUser']);
-    Route::post('/update/users/{id}', [AuthController::class, 'updateUser']);
-    Route::delete('/delete/users/{id}', [AuthController::class, 'destroy']);
+        // Users //    
+        Route::get('/usersList', [AuthController::class, 'list']); 
+        Route::post('/createusers', [AuthController::class, 'store']);
+        Route::get('/get/users/{id}', [AuthController::class, 'edit']);
+        Route::get('/getUserById/{id}', [AuthController::class, 'getUserById']);
+        Route::put('/update/users/{id}', [AuthController::class, 'updateUser']);
+        Route::post('/update/users/{id}', [AuthController::class, 'updateUser']);
+        Route::delete('/delete/users/{id}', [AuthController::class, 'destroy']);
 
-});
-    // Students //
-    Route::get('/studentsList', [StudentController::class, 'list']);  
-    Route::post('/createstudents', [StudentController::class, 'store']); 
-    Route::get('/students/search', [StudentController::class, 'search']);
-    Route::put('/update/students/{id}', [StudentController::class, 'update']); 
-    Route::delete('/delete/students/{id}', [StudentController::class, 'destroy']);
-    Route::get('/get/students/{id}', [StudentController::class, 'edit']);
+        // Students //
+        Route::get('/studentsList', [StudentController::class, 'list']);  
+        Route::get('/getStudentById/{id}', [StudentController::class, 'getStudentById']);
+        Route::put('/update/students/{id}', [StudentController::class, 'update']); 
+        Route::get('/get/students/{id}', [StudentController::class, 'edit']);
+        
+    });
+
 
 
     // Route::get('/employeesList', [EmployeeController::class, 'list']);
