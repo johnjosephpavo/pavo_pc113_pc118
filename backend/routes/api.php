@@ -33,6 +33,7 @@ use App\Http\Controllers\EmployeeController;
         Route::get('/studentsList', [StudentController::class, 'list']);  
         Route::get('/getStudentById/{id}', [StudentController::class, 'getStudentById']);
         Route::put('/update/students/{id}', [StudentController::class, 'update']); 
+        Route::post('/update/students/{id}', [StudentController::class, 'update']); 
         Route::get('/get/students/{id}', [StudentController::class, 'edit']);
         
     });

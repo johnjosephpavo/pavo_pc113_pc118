@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -34,11 +35,15 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request, $id): JsonResponse
     {
+        Log::info("Update student attempt for ID: $id", $request->all());
+
         $student = Student::find($id);
 
         if (!$student) {
+            Log::warning("Student not found: $id");
             return response()->json(['message' => 'Student not found'], 404);
         }
 
@@ -53,10 +58,10 @@ class StudentController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::error("Validation failed", $validator->errors()->toArray());
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Update student-specific data
         $student->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -66,6 +71,8 @@ class StudentController extends Controller
             'course' => $request->course,
             'contact_number' => $request->contact_number,
         ]);
+
+        Log::info("Student updated successfully for ID: $id");
 
         return response()->json([
             'status' => true,
