@@ -515,6 +515,8 @@
         event.preventDefault();
         const studentId = button.dataset.id;
         document.getElementById("edit_student_id").value = studentId;
+        console.log("Updating student ID:", studentId);
+
   
         // Fetch and populate
         fetch(`http://127.0.0.1:8000/api/getStudentById/${studentId}`, {
@@ -568,7 +570,7 @@
     }
   
     // EVENT: Submit Edit Form
-        document.getElementById("editUserForm").addEventListener("submit", function (e) {
+        document.getElementById("editStudentForm").addEventListener("submit", function (e) {
         e.preventDefault();
         alertMessage.classList.add('d-none');  // Hide previous messages
 
