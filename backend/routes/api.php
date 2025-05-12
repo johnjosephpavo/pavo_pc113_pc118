@@ -46,6 +46,7 @@ use App\Http\Controllers\AssignmentController;
         Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
         Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
         Route::get('/getAdmins', [AssignmentController::class, 'getAdmins']);
+        Route::delete('/delete/assignments/{id}', [AssignmentController::class, 'destroy']);
 
         
     });

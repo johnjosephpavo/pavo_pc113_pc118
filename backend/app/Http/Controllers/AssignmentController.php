@@ -122,9 +122,22 @@ class AssignmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        try {
+            $assignment = Assignment::findOrFail($id);
+            $assignment->delete();
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Assignment Deleted Successfully!',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }   
     }
 
     public function getAssignmentById($id)
