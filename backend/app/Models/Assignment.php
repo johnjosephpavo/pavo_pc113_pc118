@@ -17,6 +17,7 @@ class Assignment extends Model
         'title',
         'description',
         'due_date',
+        'status'
     ];
 
     public function user()

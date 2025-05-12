@@ -213,24 +213,6 @@ class AssignmentController extends Controller
         }
     }
 
-    public function getAdmins()
-    {
-        try {
-            // Fetch all users with role 1 (Admin), including the currently logged-in user if needed
-            $admins = User::where('role', 1)->get();
-
-            return response()->json([
-                'status' => true,
-                'admins' => $admins
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to fetch admins.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
 
 
 

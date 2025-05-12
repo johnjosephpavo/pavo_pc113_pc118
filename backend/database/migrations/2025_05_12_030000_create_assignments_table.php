@@ -20,10 +20,14 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('due_date')->nullable();
 
+            // Status
+            $table->unsignedTinyInteger('status')->default(0);
+
             $table->timestamps();
 
             $table->foreign('assigned_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('assigned_to')->references('id')->on('users')->onDelete('cascade');
+
         });
     }
 

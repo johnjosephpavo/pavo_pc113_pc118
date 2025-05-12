@@ -45,8 +45,12 @@ use App\Http\Controllers\AssignmentController;
         Route::post('/update/assignments/{id}', [AssignmentController::class, 'updateAssignment']); 
         Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
         Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
-        Route::get('/getAdmins', [AssignmentController::class, 'getAdmins']);
         Route::delete('/delete/assignments/{id}', [AssignmentController::class, 'destroy']);
+
+        // Submit Assignments //
+        Route::post('assignments/{assignmentId}/submit', [AssignmentSubmissionController::class, 'submitAssignment']);
+        Route::get('assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissions']);
+        Route::get('/get/assignmentsList', [AssignmentController::class, 'getAssignmentsList']);
 
         
     });
