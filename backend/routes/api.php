@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AssignmentController;
 
 
 // Route::middleware(['auth:sanctum', 'allow.roles:1,2,3'])->group(function () {
@@ -35,6 +36,17 @@ use App\Http\Controllers\EmployeeController;
         Route::put('/update/students/{id}', [StudentController::class, 'update']); 
         Route::post('/update/students/{id}', [StudentController::class, 'update']); 
         Route::get('/get/students/{id}', [StudentController::class, 'edit']);
+
+        // Assignments //
+        Route::get('/assignmentsList', [AssignmentController::class, 'list']); 
+        Route::post('/createAssignment', [AssignmentController::class, 'createAssignment']);
+        Route::get('/getAssignmentById/{id}', [AssignmentController::class, 'getAssignmentById']);
+        Route::put('/update/assignments/{id}', [AssignmentController::class, 'update']); 
+        Route::post('/update/assignments/{id}', [AssignmentController::class, 'update']); 
+        Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
+        Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
+        Route::get('/getAdmins', [AssignmentController::class, 'getAdmins']);
+
         
     });
 

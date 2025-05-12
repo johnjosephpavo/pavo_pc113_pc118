@@ -100,7 +100,7 @@ class StudentController extends Controller
     }
     
 
-     public function getStudentById($id)
+    public function getStudentById($id)
     {
         $student = Student::with('user')->find($id); // loads student and user
     

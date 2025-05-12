@@ -28,7 +28,7 @@ class AdminSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        User::factory(20)->create();
+        // User::factory(20)->create();
 
     }
 }

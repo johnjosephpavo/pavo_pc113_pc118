@@ -61,4 +61,15 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'user_id');
     }
 
+    public function assignedAssignments()
+    {
+        return $this->hasMany(Assignment::class, 'assigned_by');
+    }
+
+    public function receivedAssignments()
+    {
+        return $this->hasMany(Assignment::class, 'assigned_to');
+    }
+
+
 }
