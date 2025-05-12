@@ -79,7 +79,8 @@
 
         <!-- Users -->
         <li class="nav-item">
-          <a class="nav-link active" href="#"> <!-- ../pages/tables.html-->
+          <a class="nav-link" href="users.html"> 
+            <!-- ../pages/tables.html-->
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -123,7 +124,7 @@
 
         <!-- Assignments -->
           <li class="nav-item">
-          <a class="nav-link  " href="../frontend/assignments.html">
+          <a class="nav-link active" href="../frontend/assignments.html">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -177,9 +178,9 @@
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
           <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
-          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Users</li>
+          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Assignments</li>
         </ol>
-        <h6 class="font-weight-bolder mb-0">Users</h6>
+        <h6 class="font-weight-bolder mb-0">Assignments</h6>
       </nav>
       <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
         <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
@@ -221,7 +222,7 @@
         <div class="col-12">
           <div class="card mb-4">
             <div class="card-header pb-0">
-              <h6>Users table</h6>
+              <h6>Assignments table</h6>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
@@ -229,11 +230,10 @@
                   <div class="card-header">
                       <div class="row">
                           <div class="col-md-6 col-12">
-                              <h1><i class="fa fa-solid fa-users mt-2"></i> List of Users</h1>
+                              <h1><i class="fa fa-solid fa-users mt-2"></i> List of Assignments</h1>
                           </div>
                           <div class="col-md-6 col-12">
-                              <!-- <a href="users-create.html" class="float-end btn btn-primary mt-2"><i class="fa fa-solid fa-user"></i> Add User</a> -->
-                              <button id="showFormButton" class="float-end btn btn-primary mt-2"><i class="fa fa-solid fa-user"></i> Add User</button>
+                            <button id="showFormButton" class="float-end btn btn-primary mt-2"><i class="fa fa-solid fa-user"></i> Add Assignment</button>
                           </div>
                       </div>
                   <div class="card-body">
@@ -241,13 +241,16 @@
                           This is Message!
                       </div>
                       <div class="table-responsive">
-                          <table class="table table-hover table-stripped table-column table-sm" id="usersTable">
-                              <caption>Users Table</caption>
+                          <table class="table table-hover table-stripped table-column table-sm" id="assignmentsTable">
+                              <caption>Assignments Table</caption>
                               <thead>
                                   <tr>
                                       <th class="col">ID</th>
-                                      <th class="col">Email</th>
-                                      <th class="col">Role</th>
+                                      <th class="col">Assign By</th>
+                                      <th class="col">Assign To</th>
+                                      <th class="col">Title</th>
+                                      <th class="col">Description</th>
+                                      <th class="col">Due Date</th>
                                       <th class="col">Action</th>
                                   </tr>
                               </thead>
@@ -264,177 +267,51 @@
         </div>
       </div>
 
-     <!-- Create User Form -->
+    <!-- Create Assignment Form -->
       <div class="card">
         <div id="showCreateForm" class="container mt-5" style="display: none;">
-          <h2 class="mb-4 text-center">Create User</h2>
+          <h2 class="mb-4 text-center">Create Assignment</h2>
           <div id="alertMessage" class="alert d-none"></div>
           
-          <form id="createUserForm" enctype="multipart/form-data">
-              <input type="hidden" id="user_id">
-  
-              <div class="form-group">
-                  <label for="profile_image">Profile Image</label>
-                  <input type="file" class="dropify form-control" id="profile_image" name="profile_image">
-              </div> 
-  
-              <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" class="form-control" id="email" required>
-              </div>
+          <form id="createAssignmentForm">
+            <input type="hidden" id="assignment_id">
 
-              <div class="form-group">
-                            <label for="inputEmail4">Role</label>
-                            <select name="role" id="role" class="form-control">
-                                <option value="" selected disabled>Select a Role</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Student</option>
-                            </select>
-              </div>
+            <div class="form-group">
+                <label for="assigned_by">Assigned By (User ID)</label>
+                <select class="form-control" id="assigned_by" name="assigned_by" required>
+                    <option value="" disabled selected>Select an Admin</option>
+                </select>
+            </div>
 
-              <!-- Role Fiels -->
-              <div id="studentFields" style="display: none;">
-                  <div class="form-group">
-                      <label>First Name</label>
-                      <input type="text" class="form-control" id="first_name" name="first_name">
-                  </div>
-                  <div class="form-group">
-                      <label>Last Name</label>
-                      <input type="text" class="form-control" id="last_name" name="last_name">
-                  </div>
-                  <div class="form-group">
-                      <label>Age</label>
-                      <input type="text" class="form-control" id="age" name="age">
-                  </div>
-                  <div class="form-group">
-                      <label>Gender</label>
-                      <select class="form-control" id="gender" name="gender">
-                          <option value="" disabled selected>Select</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label>Address</label>
-                      <textarea class="form-control" id="address" name="address"></textarea>
-                  </div>
-                   <div class="form-group">
-                            <label for="inputEmail4">Course</label>
-                            <select name="course" id="course" class="form-control">
-                              <option value="" selected disabled>Select a Course</option>
-                              <option value="BSIT">BSIT</option>
-                              <option value="BSCS">BSCS</option>
-                              <option value="BSBA">BSBA</option>
-                              <option value="BEED">BEED</option>
-                              <option value="BSED">BSED</option>
-                              <option value="BSED-Math">BSED-Math</option>
-                              <option value="BSN">BSN</option>
-                            </select>
-                </div>
-                  <div class="form-group">
-                      <label>Contact Number</label>
-                      <input type="text" class="form-control" id="contact_number" name="contact_number">
-                  </div>
-              </div>
-              <!-- End of Role Fields -->
+            <div class="form-group">
+                  <label for="assigned_to">Assign To (Student)</label>
+                  <select class="form-control" id="assigned_to" name="assigned_to" required>
+                    <option value="" disabled selected>Loading Students...</option>
+                  </select>
+            </div>
 
-              <div class="form-group">
-                  <label for="password">Password</label>
-                  <input type="password" class="form-control" id="password" required>
-              </div>
-  
-              <button type="submit" class="btn btn-primary">Create User</button>
-              <a href="#" class="btn btn-secondary" id="cancelButton">Cancel</a>
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group col-md-2">
+              <label for="due_date">Due Date</label>
+              <input type="date" class="form-control" id="due_date" name="due_date" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Assignment</button>
+            <a href="#" class="btn btn-secondary" id="cancelButton">Cancel</a>
           </form>
+
          </div>
       </div>
-     <!-- End of Create User Form -->
-
-    <!-- Edit User Form -->
-     <div class="card">
-        <div id="showEditForm" class="container mt-5" style="display: none;">
-          <h2 class="mb-4 text-center">Edit User</h2>
-          <div id="alertMessage" class="alert d-none"></div>
-          
-          <form id="editUserForm" enctype="multipart/form-data">
-              <input type="hidden" id="edit_user_id">
-    
-              <div class="form-group">
-                  <label for="profile_image">Profile Image</label>
-                  <input type="file" class="form-control" id="edit_profile_image" name="profile_image" accept="image/*">
-              </div>
-    
-              <div class="form-group">
-                  <label for="edit_email">Email</label>
-                  <input type="email" class="form-control" id="edit_email">
-              </div>
-
-              <div class="form-group">
-                            <label for="inputEmail4">Role</label>
-                            <select name="role" id="edit_role" class="form-control">
-                                <option value="" select disabled >Select a Role</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Student</option>
-                            </select>
-              </div>
-
-              <!-- Role  Edit Fiels -->
-              <div id="studentEditFields">
-                  <div class="form-group">
-                      <label>First Name</label>
-                      <input type="text" class="form-control" id="edit_first_name" name="first_name">
-                  </div>
-                  <div class="form-group">
-                      <label>Last Name</label>
-                      <input type="text" class="form-control" id="edit_last_name" name="last_name">
-                  </div>
-                  <div class="form-group">
-                      <label>Age</label>
-                      <input type="text" class="form-control" id="edit_age" name="age">
-                  </div>
-                  <div class="form-group">
-                      <label>Gender</label>
-                      <select class="form-control" id="edit_gender" name="gender">
-                          <option value="" disabled selected>Select</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label>Address</label>
-                      <textarea class="form-control" id="edit_address" name="address"></textarea>
-                  </div>
-                   <div class="form-group">
-                            <label for="inputEmail4">Course</label>
-                            <select name="course" id="edit_course" class="form-control">
-                              <option value="" selected disabled>Select a Course</option>
-                              <option value="BSIT">BSIT</option>
-                              <option value="BSCS">BSCS</option>
-                              <option value="BSBA">BSBA</option>
-                              <option value="BEED">BEED</option>
-                              <option value="BSED">BSED</option>
-                              <option value="BSED-Math">BSED-Math</option>
-                              <option value="BSN">BSN</option>
-                            </select>
-                </div>
-                  <div class="form-group">
-                      <label>Contact Number</label>
-                      <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
-                  </div>
-              </div>
-              <!-- End of Edit Role Fields -->
-              
-              <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="edit_password">
-              </div>
-
-              <button type="submit" class="btn btn-success">Update User</button>
-              <a href="#" class="btn btn-secondary" id="cancelEditButton">Cancel</a>
-          </form>
-        </div>
-     </div>
-    <!-- End of Edit User Form -->
+     <!-- End of Create Assignment Form -->
 
       <footer class="footer pt-3  ">
         <div class="container-fluid">
@@ -542,7 +419,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete this user?
+          Are you sure you want to delete this student?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -581,130 +458,70 @@
   }
  </script>
 
-<!-- Contact Number limit to 11 in create -->
+<!-- Script for get students in assigned_to -->
 <script>
-        document.getElementById('contact_number').addEventListener('input', function(event) {
-            let input = event.target;
-            let value = input.value;
-            if (value.length > 11) {
-                input.value = value.slice(0, 11); 
-            }
-        });    
-</script>
-<!-- Contact Number limit to 11 in edit -->
-<script>
-        document.getElementById('edit_contact_number').addEventListener('input', function(event) {
-            let input = event.target;
-            let value = input.value;
-            if (value.length > 11) {
-                input.value = value.slice(0, 11); 
-            }
-        });    
-</script>
-
-<!-- Showing the list of all the users -->
- <script>
-      function getCurrentUser() {
-            return fetch('http://127.0.0.1:8000/api/user', {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            }).then(res => res.json());
-        }
-
-  document.addEventListener('DOMContentLoaded', async  function(){
-    const currentUser = await getCurrentUser(); // Get logged-in user
-  
-      fetch('http://127.0.0.1:8000/api/usersList', {
-          method: 'GET',
-          headers:{
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + localStorage.getItem('token')
-          },
-      }).then(res => res.json())
-        .then(users => {
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].id === currentUser.id) continue;
-                
-                // Mapping using switch case //
-                let roleName = '';
-                switch(users[i].role){
-                    case '1':
-                        case 1:
-                            roleName = 'Admin';
-                            break;
-                    case '2':
-                        case 2:
-                            roleName = 'Student';
-                            break;
-                    default:
-                            roleName = 'Unknown';
-                }
-
-                const row = "<tr>" +
-                    "<td>" + users[i].id + "</td>" +
-                    "<td>" + users[i].email + "</td>" +
-                     "<td><span class='badge " + (roleName === 'Admin' ? 'bg-primary' : 'bg-warning') + "'>" + roleName + "</span></td>" +
-                    "<td>" +
-                      `<button id='showEditFormButton' class='showEditFormButton btn btn-warning btn-sm me-2' data-id="${users[i].id}" title='Edit Button'><i class='fa fa-solid fa-edit'></i> Edit</button>` +
-                      `<a class='deleteUser btn btn-danger btn-sm' data-user-id='${users[i].id}' title='Delete Button'><i class='fa fa-solid fa-trash'></i> Delete</a>` +
-                    "</td>" +
-                "</tr>";
-                document.getElementById('usersTable').innerHTML += row;
-            }
-        })
-        
-
-      // Delegate delete button click
-      document.getElementById('usersTable').addEventListener('click', function (event) {
-        if (event.target.closest('.deleteUser')) {
-          const button = event.target.closest('.deleteUser');
-          currentUserId = button.getAttribute('data-user-id');
-
-          // Bootstrap 5 modal show
-          const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-          deleteModal.show();
-        }
-      });
-
-
-      // Handle confirm delete once
-      document.getElementById('confirmDelete').addEventListener('click', function () {
-        if (!currentUserId) return;
-
-        fetch(`http://127.0.0.1:8000/api/delete/users/${currentUserId}`, {
-          method: 'DELETE',
+  document.addEventListener('DOMContentLoaded', function () {
+      fetch('http://127.0.0.1:8000/api/getStudents', {
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + localStorage.getItem('token')
           }
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status) {
-              console.log(data.message);
-              location.reload();
-            } else {
-              let errorMessage = document.getElementById('confirm-message');
-              errorMessage.innerHTML = data.message;
-              errorMessage.classList.remove('d-none');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
+      })
+      .then(response => response.json())
+      .then(data => {
+          const select = document.getElementById('assigned_to');
+          select.innerHTML = '<option value="" disabled selected>Select a student</option>';
+
+          data.students.forEach(student => {
+              const option = document.createElement('option');
+              option.value = student.id;
+              option.textContent = `${student.first_name} ${student.last_name}`;
+              select.appendChild(option);
           });
+      })
+      .catch(error => {
+          console.error('Error loading students:', error);
       });
   });
-
 </script>
-<!-- End of Showing the list of all the users -->
+<!-- End of Script for get students in assigned_to -->
 
-<!-- Show the form in create User-->
+<!-- Script for get admins in assigned_by  -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://127.0.0.1:8000/api/getAdmins', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token') 
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('assigned_by');
+        select.innerHTML = '<option value="" disabled selected>Select a Admin</option>';
+
+        if (data.status && data.admins) {
+            data.admins.forEach(admin => {
+                const option = document.createElement('option');
+                option.value = admin.id;  // Admin's ID is the value
+                option.textContent = `${admin.email} `; // Admin's full name is displayed
+                // ${admin.last_name}  
+                select.appendChild(option);
+            });
+        } else {
+            console.error('Error fetching admins:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  });
+</script>
+<!-- End of Script for get admins in assigned by -->
+
+
+<!-- Show the form in create Assignment -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const cancelButton = document.getElementById("cancelButton");
@@ -740,26 +557,12 @@
     }
   });
 </script>
-<!-- End of form in create User-->
+<!-- End of form in create Assignment-->
 
-<!-- Show Role fields if the role is 2 in Create User-->
-<script>
-  document.getElementById('role').addEventListener('change', function () {
-    const studentFields = document.getElementById('studentFields');
-    if (this.value === '2') {
-        studentFields.style.display = 'block';
-    } else {
-        studentFields.style.display = 'none';
-    }
-});
-
-</script>
-<!-- End of Show Role fields if the role is 2 in Create User-->
-
-<!-- Script for submitting the form in users create -->
+<!-- Script for Submitting the form in assignments -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      const form = document.querySelector('#createUserForm');
+      const form = document.querySelector('#createAssignmentForm');
       const formContainer = document.getElementById('showCreateForm');
       const messageDiv = document.getElementById('alertMessage');
   
@@ -769,33 +572,17 @@
           event.preventDefault();
   
           let formData = new FormData();
-          formData.append('email', document.getElementById('email').value);
-          formData.append('role', document.getElementById('role').value);
-          formData.append('password', document.getElementById('password').value);
-
-          let profileImageInput = document.getElementById('profile_image');
-          if (profileImageInput.files.length > 0) {
-              formData.append('profile_image', profileImageInput.files[0]);
-          }
-
-          // If role is 2 which is student //
-          const role = document.getElementById('role').value;
-          formData.append('role', role);
-
-          if (role === '2') {
-          formData.append('first_name', document.getElementById('first_name').value);
-          formData.append('last_name', document.getElementById('last_name').value);
-          formData.append('age', document.getElementById('age').value);
-          formData.append('gender', document.getElementById('gender').value);
-          formData.append('address', document.getElementById('address').value);
-          formData.append('course', document.getElementById('course').value);
-          formData.append('contact_number', document.getElementById('contact_number').value);
-      }
+          formData.append('assigned_by', document.getElementById('assigned_by').value);
+          formData.append('assigned_to', document.getElementById('assigned_to').value);
+          formData.append('title', document.getElementById('title').value);
+          formData.append('description', document.getElementById('description').value);
+          formData.append('due_date', document.getElementById('due_date').value);
   
-          fetch('http://127.0.0.1:8000/api/createusers', {
+          fetch('http://127.0.0.1:8000/api/createAssignment', {
               method: 'POST',
               body: formData,
               headers: {
+                  Accept: 'application/json',
                   Authorization: 'Bearer ' + localStorage.getItem('token'),
                   'Cache-Control': 'no-cache',
                   'Pragma': 'no-cache',
@@ -809,7 +596,7 @@
                   // Show success message
                   messageDiv.classList.remove('d-none', 'alert-danger');
                   messageDiv.classList.add('alert', 'alert-success');
-                  messageDiv.innerText = "User created successfully!";
+                  messageDiv.innerText = "Assignment created successfully!";
   
                   // Hide the form with fade-out effect
                   formContainer.style.transition = "opacity 0.5s ease";
@@ -836,162 +623,71 @@
       });
   });
 </script>
-<!-- End of Script for submitting the form in users create -->
+<!-- End of Script for Submitting the form in assignments -->
 
-<!-- Show the form in edit User also for submitting the form in users edit -->
+<!-- Showing the list of all the assignments -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const formContainer = document.getElementById("showEditForm");
-    const cancelEditButton = document.getElementById("cancelEditButton");
-    const alertMessage = document.getElementById("alertMessage");
-    
-    //  if role is 2 //
-    function toggleStudentFields(role) {
-      const studentFields = document.getElementById("studentEditFields");
-      if (role === 2) {
-        studentFields.style.display = "block";
-      } else {
-        studentFields.style.display = "none";
-      }
-    }
+      function getCurrentUser() {
+            return fetch('http://127.0.0.1:8000/api/user', {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            }).then(res => res.json());
+        }
 
-    // EVENT: Show Edit Form
-    document.addEventListener("click", function (event) {
-      const button = event.target.closest(".showEditFormButton");
-      if (button) {
-        event.preventDefault();
-        const userId = button.dataset.id;
-        document.getElementById("edit_user_id").value = userId;
-  
-        // Fetch and populate
-        fetch(`http://127.0.0.1:8000/api/getUserById/${userId}`, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + localStorage.getItem('token')
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (!data || data.status === false) {
-            alert("User not found");
-            return;
-          }
-          
-          // Populate form fields with the fetched user data
-          document.getElementById("edit_email").value = data.user.email;
-          document.getElementById("edit_role").value = data.user.role;
-          toggleStudentFields(data.user.role);  // This will show based on the role
-          
-          if (data.user.role === 2 && data.student) {
-            toggleStudentFields(2);
-            document.getElementById("edit_first_name").value = data.student.first_name || "";
-            document.getElementById("edit_last_name").value = data.student.last_name || "";
-            document.getElementById("edit_age").value = data.student.age || "";
-            document.getElementById("edit_gender").value = data.student.gender || "";
-            document.getElementById("edit_address").value = data.student.address || "";
-            document.getElementById("edit_course").value = data.student.course || "";
-            document.getElementById("edit_contact_number").value = data.student.contact_number || "";
-          } else {
-            toggleStudentFields(1); // Hide student fields for Admin
-          }
-
-          // Show form
-          formContainer.style.display = "block";
-          formContainer.style.opacity = 0;
-          formContainer.style.transition = "opacity 0.5s ease";
-          setTimeout(() => formContainer.style.opacity = 1, 10);
-          document.getElementById("edit_role").addEventListener("change", function () {
-            toggleStudentFields(this.value);
-          });
-
-        })
-        .catch(error => {
-          console.error("Fetch error:", error);
-          alert("Failed to load user.");
-        });
-      }
-    });
-  
-    // EVENT: Cancel Edit
-    if (cancelEditButton) {
-      cancelEditButton.addEventListener("click", function (e) {
-        e.preventDefault();
-        formContainer.style.transition = "opacity 0.5s ease";
-        formContainer.style.opacity = 0;
-        setTimeout(() => {
-          formContainer.style.display = "none";
-        }, 500);
-      });
-    }
-  
-    // EVENT: Submit Edit Form
-        document.getElementById("editUserForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        alertMessage.classList.add('d-none');  // Hide previous messages
-
-        const userId = document.getElementById("edit_user_id").value;  // Get the user ID from the form
-        const role = parseInt(document.getElementById("edit_role").value);
-        const formData = new FormData();
-
-        formData.append('email', document.getElementById("edit_email").value);  // Email field
-        formData.append('role', role);  // Role field
-        formData.append('password', document.getElementById("edit_password").value);  // Password field
+        document.addEventListener('DOMContentLoaded', async  function(){
+          const currentUser = await getCurrentUser(); // Get logged-in user
         
-        // Handle Profile Image upload
-        const profileImage = document.getElementById("edit_profile_image").files[0];
-        if (profileImage) {
-            formData.append('profile_image', profileImage);
-        }
+            fetch('http://127.0.0.1:8000/api/assignmentsList', {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    },
+                })
+                .then(res => res.json())
+                .then(assignments => {
+                    const table = document.getElementById('assignmentsTable');
 
-        // Append student-specific fields if role is 2
-        if (role === 2) {
-            formData.append('first_name', document.getElementById("edit_first_name").value);
-            formData.append('last_name', document.getElementById("edit_last_name").value);
-            formData.append('age', document.getElementById("edit_age").value);
-            formData.append('gender', document.getElementById("edit_gender").value);
-            formData.append('address', document.getElementById("edit_address").value);
-            formData.append('course', document.getElementById("edit_course").value);
-            formData.append('contact_number', document.getElementById("edit_contact_number").value);
-        }
+                    for (let i = 0; i < assignments.length; i++) {
+                        const assignment = assignments[i];
 
-        formData.append('_method', 'PUT');  // Laravel needs this to treat it as a PUT request
+                        // Skip if it's the current user (optional)
+                        if (assignment.id === currentUser.id) continue;
 
-        // Send form data using fetch
-        fetch(`http://127.0.0.1:8000/api/update/users/${userId}`, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('token')  // Authorization header for token-based auth
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === true) {
-                alertMessage.className = "alert alert-success";  // Show success message
-                alertMessage.innerText = data.message;
-                alertMessage.classList.remove('d-none');
-                setTimeout(() => window.location.reload(), 1000);  // Reload after update
-            } else {
-                alertMessage.className = "alert alert-danger";  // Show error message
-                alertMessage.innerText = data.message || Object.values(data.errors).join('\n');
-                alertMessage.classList.remove('d-none');
-            }
-        })
-        .catch(error => {
-            console.error("Update error:", error);
-            alertMessage.className = "alert alert-danger";
-            alertMessage.innerText = "Server error.";
-            alertMessage.classList.remove('d-none');
-        });
+                        const assignedBy = assignment.user ? `${assignment.user.email}` : 'N/A';
+                       const assignedTo = assignment.student && assignment.student.student 
+                          ? `${assignment.student.student.first_name} ${assignment.student.student.last_name}`
+                          : 'N/A';
+
+                        const row = `<tr>
+                            <td>${assignment.id}</td>
+                            <td>${assignedBy}</td>
+                            <td>${assignedTo}</td>
+                            <td>${assignment.title}</td>
+                            <td>${assignment.description}</td>
+                            <td>${assignment.due_date}</td>
+                            <td>
+                                <button class="showEditFormButton btn btn-warning btn-sm me-2" data-id="${assignment.id}" title="Edit Button">
+                                    <i class="fa fa-solid fa-edit"></i> Edit
+                                </button>
+                                <a class="deleteAssignment btn btn-danger btn-sm" data-assignment-id="${assignment.id}" title="Delete Button">
+                                    <i class="fa fa-solid fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>`;
+
+                        table.innerHTML += row;
+                    }
+          });
     });
-  });
+
 </script>
-<!-- End of Script for submitting the form in users edit -->
-
-
+<!-- End of Showing the list of all the assignments -->
 
 
 </body>
