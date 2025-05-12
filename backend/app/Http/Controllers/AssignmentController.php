@@ -54,12 +54,6 @@ class AssignmentController extends Controller
                 'due_date' => 'nullable|date',
             ]);
 
-            // Optional Role check — only uncomment if sure role is an integer:
-            // if (auth()->user()->role !== 1) {
-            //     Log::warning('Unauthorized attempt to create assignment', ['user_id' => auth()->id()]);
-            //     return response()->json(['message' => 'Unauthorized'], 403);
-            // }
-
             $assignment = Assignment::create([
                 'assigned_by' => auth()->id(),
                 'assigned_to' => $request->assigned_to,
@@ -100,7 +94,7 @@ class AssignmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-     public function edit($id)
+    public function edit($id)
     {
         $assignment = Assignment::find($id);
     
@@ -114,10 +108,56 @@ class AssignmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateAssignment(Request $request, string $id)
     {
-        //
+        try {
+            Log::info('updateAssignment called', [
+                'user_id' => auth()->id(),
+                'assignment_id' => $id,
+                'request_data' => $request->all()
+            ]);
+
+            $request->validate([
+                'assigned_to' => 'required|exists:users,id',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'due_date' => 'nullable|date',
+            ]);
+
+            $assignment = Assignment::findOrFail($id);
+
+            // Optional: check if current user is authorized to update
+            // if ($assignment->assigned_by !== auth()->id()) {
+            //     return response()->json(['message' => 'Unauthorized'], 403);
+            // }
+
+            $assignment->update([
+                'assigned_to' => $request->assigned_to,
+                'title' => $request->title,
+                'description' => $request->description,
+                'due_date' => $request->due_date,
+            ]);
+
+            Log::info('Assignment updated', ['assignment_id' => $assignment->id]);
+
+            return response()->json(['status' => true, 'message' => 'Assignment updated.']);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to update assignment', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'assignment_id' => $id,
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update assignment.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -142,19 +182,19 @@ class AssignmentController extends Controller
 
     public function getAssignmentById($id)
     {
-        $student = Student::with('user')->find($id); // loads student and user
+        $assignment = Assignment::with('user')->find($id); // loads assignment and user
     
-        if (!$student) {
+        if (!$assignment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Student not found'
+                'message' => 'Assignment not found'
             ], 404);
         }
     
         return response()->json([
             'status' => true,
-            'student' => $student,
-            'user' => $student->user, //include user
+            'assignment' => $assignment,
+            'user' => $assignment->user, //include user
         ], 200);
     }
 
