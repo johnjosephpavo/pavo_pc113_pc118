@@ -311,7 +311,53 @@
 
          </div>
       </div>
-     <!-- End of Create Assignment Form -->
+    <!-- End of Create Assignment Form -->
+
+    <!-- Edit Assignment Form -->
+      <div class="card">
+        <div id="showEditForm" class="container mt-5" style="display: none;">
+          <h2 class="mb-4 text-center">Edit Assignment</h2>
+          <div id="alertMessage" class="alert d-none"></div>
+          
+          <form id="editAssignmentForm">
+            <input type="hidden" id="edit_assignment_id">
+
+            <div class="form-group">
+                <label for="edit_assigned_by">Assigned By (User ID)</label>
+                <select class="form-control" id="edit_assigned_by" name="assigned_by" required>
+                    <option value="" disabled selected>Select an Admin</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                  <label for="edit_assigned_to">Assign To (Student)</label>
+                  <select class="form-control" id="edit_assigned_to" name="assigned_to" required>
+                    <option value="" disabled selected>Loading Students...</option>
+                  </select>
+            </div>
+
+            <div class="form-group">
+              <label for="edit_title">Title</label>
+              <input type="text" class="form-control" id="edit_title" name="title" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit_description">Description</label>
+              <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group col-md-2">
+              <label for="edit_due_date">Due Date</label>
+              <input type="date" class="form-control" id="edit_due_date" name="due_date" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Assignment</button>
+            <a href="#" class="btn btn-secondary" id="cancelButton">Cancel</a>
+          </form>
+
+         </div>
+      </div>
+    <!-- End of Edit Assignment Form -->
 
       <footer class="footer pt-3  ">
         <div class="container-fluid">
@@ -559,6 +605,121 @@
 </script>
 <!-- End of form in create Assignment-->
 
+<!-- Show the form in edit Assignment-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const formContainer = document.getElementById("showEditForm");
+    const cancelEditButton = document.getElementById("cancelEditButton");
+    const alertMessage = document.getElementById("alertMessage");
+  
+    // EVENT: Show Edit Form
+    document.addEventListener("click", function (event) {
+      const button = event.target.closest(".showEditFormButton");
+      if (button) {
+        event.preventDefault();
+        const assignmentId = button.dataset.id;
+        document.getElementById("edit_assignment_id").value = assignmentId;
+        console.log("Updating Assignment ID:", assignmentId);
+
+  
+        // Fetch and populate
+        fetch(`http://127.0.0.1:8000/api/getAssignmentById/${assignmentId}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + localStorage.getItem('token')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (!data || data.status === false) {
+            alert("Assignment not found");
+            return;
+          }
+          
+          // Populate form fields with the fetched assignment data
+          document.getElementById("edit_assigned_by").value = data.assignment.assigned_by;
+          document.getElementById("edit_assigned_to").value = data.assignment.assigned_to;
+          document.getElementById("edit_title").value = data.assignment.title;
+          document.getElementById("edit_description").value = data.assignment.description;
+          document.getElementById("edit_due_date").value = data.assignment.due_date;
+
+  
+          // Show form
+          formContainer.style.display = "block";
+          formContainer.style.opacity = 0;
+          formContainer.style.transition = "opacity 0.5s ease";
+          setTimeout(() => formContainer.style.opacity = 1, 10);
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+          alert("Failed to load assignment.");
+        });
+      }
+    });
+  
+    // EVENT: Cancel Edit
+    if (cancelEditButton) {
+      cancelEditButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        formContainer.style.transition = "opacity 0.5s ease";
+        formContainer.style.opacity = 0;
+        setTimeout(() => {
+          formContainer.style.display = "none";
+        }, 500);
+      });
+    }
+  
+    // EVENT: Submit Edit Form
+        document.getElementById("editAssignmentForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        alertMessage.classList.add('d-none');  // Hide previous messages
+
+        const assignmentId = document.getElementById("edit_assignment_id").value;  // Get the user ID from the form
+        const formData = new FormData();
+        formData.append('assigned_by', document.getElementById("edit_assigned_by").value);
+        formData.append('assigned_to', document.getElementById("edit_assigned_to").value);
+        formData.append('title', document.getElementById("edit_title").value);
+        formData.append('description', document.getElementById("edit_description").value);
+        formData.append('due_date', document.getElementById("edit_due_date").value);
+
+        formData.append('_method', 'PUT');  // Laravel needs this to treat it as a PUT request
+
+        // Send form data using fetch
+        fetch(`http://127.0.0.1:8000/api/update/assignments/${assignmentId}`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')  
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === true) {
+                alertMessage.className = "alert alert-success";  // Show success message
+                alertMessage.innerText = data.message;
+                alertMessage.classList.remove('d-none');
+                setTimeout(() => window.location.reload(), 1000);  // Reload after update
+            } else {
+                alertMessage.className = "alert alert-danger";  // Show error message
+                alertMessage.innerText = data.message || Object.values(data.errors).join('\n');
+                alertMessage.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error("Update error:", error);
+            alertMessage.className = "alert alert-danger";
+            alertMessage.innerText = "Server error.";
+            alertMessage.classList.remove('d-none');
+        });
+    });
+  });
+</script>
+<!-- End of Script for submitting the form in assignments edit -->
+
+
 <!-- Script for Submitting the form in assignments -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -625,6 +786,68 @@
 </script>
 <!-- End of Script for Submitting the form in assignments -->
 
+<!-- Script for get admins in edit_assigned_by  -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://127.0.0.1:8000/api/getAdmins', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token') 
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('edit_assigned_by');
+        select.innerHTML = '<option value="" disabled selected>Select a Admin</option>';
+
+        if (data.status && data.admins) {
+            data.admins.forEach(admin => {
+                const option = document.createElement('option');
+                option.value = admin.id;  // Admin's ID is the value
+                option.textContent = `${admin.email} `; // Admin's full name is displayed
+                // ${admin.last_name}  
+                select.appendChild(option);
+            });
+        } else {
+            console.error('Error fetching admins:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  });
+</script>
+<!-- End of Script for get admins in edit_assigned by -->
+
+<!-- Script for get students in edit_assigned_to -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      fetch('http://127.0.0.1:8000/api/getStudents', {
+          headers: {
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + localStorage.getItem('token')
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          const select = document.getElementById('edit_assigned_to');
+          select.innerHTML = '<option value="" disabled selected>Select a student</option>';
+
+          data.students.forEach(student => {
+              const option = document.createElement('option');
+              option.value = student.id;
+              option.textContent = `${student.first_name} ${student.last_name}`;
+              select.appendChild(option);
+          });
+      })
+      .catch(error => {
+          console.error('Error loading students:', error);
+      });
+  });
+</script>
+<!-- End of Script for get students in edit_assigned_to -->
+
 <!-- Showing the list of all the assignments -->
 <script>
       function getCurrentUser() {
@@ -672,7 +895,7 @@
                             <td>${assignment.description}</td>
                             <td>${assignment.due_date}</td>
                             <td>
-                                <button class="showEditFormButton btn btn-warning btn-sm me-2" data-id="${assignment.id}" title="Edit Button">
+                                <button id="showEditFormButton" class="showEditFormButton btn btn-warning btn-sm me-2" data-id="${assignment.id}" title="Edit Button">
                                     <i class="fa fa-solid fa-edit"></i> Edit
                                 </button>
                                 <a class="deleteAssignment btn btn-danger btn-sm" data-assignment-id="${assignment.id}" title="Delete Button">
