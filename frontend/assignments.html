@@ -419,7 +419,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete this student?
+          Are you sure you want to delete this assignment?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -684,6 +684,47 @@
                         table.innerHTML += row;
                     }
           });
+
+          // Delegate delete button click
+          document.getElementById('assignmentsTable').addEventListener('click', function (event) {
+            if (event.target.closest('.deleteAssignment')) {
+              const button = event.target.closest('.deleteAssignment');
+              currentUserId = button.getAttribute('data-assignment-id');
+
+              // Bootstrap 5 modal show
+              const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+              deleteModal.show();
+            }
+          });
+
+          // Handle confirm delete once
+          document.getElementById('confirmDelete').addEventListener('click', function () {
+            if (!currentUserId) return;
+
+            fetch(`http://127.0.0.1:8000/api/delete/assignments/${currentUserId}`, {
+              method: 'DELETE',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status) {
+                  console.log(data.message);
+                  location.reload();
+                } else {
+                  let errorMessage = document.getElementById('confirm-message');
+                  errorMessage.innerHTML = data.message;
+                  errorMessage.classList.remove('d-none');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          });
+
     });
 
 </script>
