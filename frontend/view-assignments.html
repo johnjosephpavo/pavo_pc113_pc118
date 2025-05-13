@@ -261,10 +261,12 @@
                               <caption>View Assignments table</caption>
                               <thead>
                                   <tr>
-                                      <th class="col">Assign By</th>
+                                     <th class="col">Assign By</th>
+                                      <th class="col">Assign To</th>
                                       <th class="col">Title</th>
                                       <th class="col">Description</th>
                                       <th class="col">Due Date</th>
+                                       <th class="col">Status</th>
                                       <th class="col">Action</th>
                                   </tr>
                               </thead>
@@ -429,72 +431,6 @@
   }
  </script>
 
-<!-- Displaying the List of all the Assignments -->
- <script>
-    function getCurrentUser() {
-        return fetch('http://127.0.0.1:8000/api/user', {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('token')
-            }
-        }).then(res => res.json());
-    }
-
-    document.addEventListener('DOMContentLoaded', async function () {
-        const currentUser = await getCurrentUser(); // Get logged-in user
-
-        fetch('http://127.0.0.1:8000/api/assignmentsList', {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('token')
-            },
-        })
-        .then(res => res.json())
-        .then(assignments => {
-            const table = document.getElementById('viewAssignmentsTable'); 
-
-            for (let i = 0; i < assignments.length; i++) {
-                const assignment = assignments[i];
-
-                const assignedTo = assignment.student && assignment.student.student 
-                    ? `${assignment.student.student.first_name} ${assignment.student.student.last_name}`
-                    : 'N/A';
-
-                const row = `<tr>
-                    <td>${assignedTo}</td>
-                    <td>${assignment.title}</td>
-                    <td>${assignment.description}</td>
-                    <td>${assignment.due_date}</td>
-                    <td>
-                        <a href="#" class="btn btn-primary btn-sm submitAssignment" data-id="${assignment.id}" title="Submit Assignment">
-                            Submit
-                        </a>
-                    </td>
-                </tr>`;
-
-                table.innerHTML += row;
-            }
-        });
-
-        // Handle submit assignment action
-        document.getElementById('viewAssignmentsTable').addEventListener('click', function (event) {
-            if (event.target.closest('.submitAssignment')) {
-                const button = event.target.closest('.submitAssignment');
-                const assignmentId = button.getAttribute('data-id');
-
-                // You can redirect to a submission page or show a modal
-                window.location.href = `/submit-assignment/${assignmentId}`;
-            }
-        });
-    });
-</script>
-<!-- End of Displaying the List of all the Assignments -->
-
-
 <!-- Hide sidebar using user role -->
   <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -502,7 +438,7 @@
 
       if (!token) {
           alert("Access denied. You are not authenticated.");
-          window.location.href = '/frontend/index.html';
+          // window.location.href = '/frontend/index.html';
       } else {
           fetch('http://127.0.0.1:8000/api/user', {
               method: 'GET',
@@ -532,6 +468,81 @@
       }
   });
 </script>
+<!-- End of Hide sidebar using user role -->
+
+<!-- Displaying the List of all the Assignments -->
+ <script>
+   
+    function getCurrentUser() {
+        return fetch('http://127.0.0.1:8000/api/user', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            credentials: 'include'
+        }).then(res => res.json());
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        // Fetch assignments assigned to the current user
+        fetch('http://127.0.0.1:8000/api/get/viewAssignments', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token') 
+            }
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === 'success') {
+                const assignments = response.data;
+                const table = document.getElementById('viewAssignmentsTable').getElementsByTagName('tbody')[0];
+
+                // Loop through each assignment and generate the table rows
+                assignments.forEach(assignment => {
+                   const assignedBy = assignment.user ? assignment.user.email : 'N/A';
+
+                   const assignedTo = assignment.student && assignment.student.student 
+                        ? `${assignment.student.student.first_name} ${assignment.student.student.last_name}`
+                        : 'N/A';
+
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${assignedBy}</td>
+                        <td>${assignedTo}</td>
+                        <td>${assignment.title}</td>
+                        <td>${assignment.description}</td>
+                        <td>${new Date(assignment.due_date).toLocaleDateString()}</td>
+                        <td>${assignment.status}</td>
+                        <td>
+                            <a href="/submit-assignment/${assignment.id}" class="btn btn-sm btn-success">Submit</a>
+                        </td>
+                    `;
+
+                    table.appendChild(row);
+                });
+            } else {
+                // Handle errors (optional)
+                document.getElementById('confirm-message').classList.remove('d-none');
+                document.getElementById('confirm-message').textContent = 'Failed to load assignments.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching assignments', error);
+            document.getElementById('confirm-message').classList.remove('d-none');
+            document.getElementById('confirm-message').textContent = 'An error occurred while fetching assignments.';
+        });
+    });
+</script>
+
+<!-- End of Displaying the List of all the Assignments -->
+
+
+
 
   
 </body>
