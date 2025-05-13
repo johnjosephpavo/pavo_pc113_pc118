@@ -8,7 +8,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AssignmentController;
 
 
-// Route::middleware(['auth:sanctum', 'allow.roles:1,2,3'])->group(function () {
+
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });
@@ -46,30 +46,23 @@ use App\Http\Controllers\AssignmentController;
         Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
         Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
         Route::delete('/delete/assignments/{id}', [AssignmentController::class, 'destroy']);
-
-        // Submit Assignments //
-        Route::post('assignments/{assignmentId}/submit', [AssignmentSubmissionController::class, 'submitAssignment']);
-        Route::get('assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissions']);
-        Route::get('/get/assignmentsList', [AssignmentController::class, 'getAssignmentsList']);
-
         
-    });
+        
+      
+    
+            // Submit Assignments //
+            Route::post('assignments/{assignmentId}/submit', [AssignmentSubmissionController::class, 'submitAssignment']);
+            Route::get('assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissions']);
+            Route::get('/get/assignmentsList', [AssignmentController::class, 'getAssignmentsList']);
+       
 
 
+    }); 
 
-    // Route::get('/employeesList', [EmployeeController::class, 'list']);
-    // Route::post('/createemployees', [EmployeeController::class, 'store']);
-    // Route::get('/employees/search', [EmployeeController::class, 'search']);
-    // Route::put('/employees/{id}', [EmployeeController::class, 'update']);
-    // Route::delete('/delete/employees/{id}', [EmployeeController::class, 'destroy']);
-    // Route::get('/get/employees/{id}', [EmployeeController::class, 'edit']);
-
+   
 
     Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [AuthController::class, 'profile']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    // Route::middleware('auth:sanctum')->put('/update/student/{id}', [StudentController::class, 'update']);
-
+        Route::get('/profile', [AuthController::class, 'profile']);
+        Route::post('/logout', [AuthController::class, 'logout']);
     });
 
-// });

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AssignmentSubmission extends Model
 {
+    protected $table = "assignment_submissions";
+    
     use HasFactory;
 
     protected $fillable = [
