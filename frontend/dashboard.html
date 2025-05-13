@@ -36,12 +36,7 @@
   <!-- Nepcha Analytics (nepcha.com) -->
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
-  <script>
-    const token = localStorage.getItem('token');
-    if(!token){
-      window.location.href = '/';
-    }
-</script>
+
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
@@ -142,9 +137,9 @@
             <span class="nav-link-text ms-1">Assignments</span>
           </a>
         </li>
-
+        
          <!-- View-Assignments -->
-          <li class="nav-item">
+          <li class="nav-item" id="view-assignments">
           <a class="nav-link  " href="../frontend/view-assignments.html">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -347,6 +342,43 @@
        window.location.href = '/frontend/index.html'; 
    }
   </script>
+
+<!-- Hide sidebar using user role -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+          window.location.href = '/frontend/index.html';
+      } else {
+          fetch('http://127.0.0.1:8000/api/user', {
+              method: 'GET',
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Accept': 'application/json'
+              }
+          })
+          .then(response => {
+              if (!response.ok) throw new Error("Authentication failed");
+              return response.json();
+          })
+          .then(user => {
+              
+              // Optional: Hide links if needed for other pages
+              if (user.role == 2) {
+                  document.querySelector('a[href="../frontend/users.html"]').closest('.nav-item').style.display = 'none';
+                  document.querySelector('a[href="../frontend/students.html"]').closest('.nav-item').style.display = 'none';
+                  document.querySelector('a[href="../frontend/assignments.html"]').closest('.nav-item').style.display = 'none';
+              }
+          })
+          .catch(error => {
+              console.error('Auth error:', error);
+              window.location.href = '/frontend/index.html';
+          });
+      }
+  });
+</script>
+
 </body>
 
 </html>

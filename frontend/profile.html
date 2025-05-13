@@ -427,7 +427,7 @@
                 return res.json();
             })
             .then(user => {
-                document.getElementById('name').textContent = user.name;
+                // document.getElementById('name').textContent = user.name;
                 document.getElementById('email').textContent = user.email;
                 const profileImageUrl = user.profile_image 
                   ? `${backendBaseUrl}/images/${user.profile_image}`
@@ -447,6 +447,42 @@
         });
 
   </script>
+  
+  <!-- Hide sidebar using user role -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = '/frontend/index.html';
+        } else {
+            fetch('http://127.0.0.1:8000/api/user', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Authentication failed");
+                return response.json();
+            })
+            .then(user => {
+                
+                // Optional: Hide links if needed for other pages
+                if (user.role == 2) {
+                    document.querySelector('a[href="../frontend/users.html"]').closest('.nav-item').style.display = 'none';
+                    document.querySelector('a[href="../frontend/students.html"]').closest('.nav-item').style.display = 'none';
+                    document.querySelector('a[href="../frontend/assignments.html"]').closest('.nav-item').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Auth error:', error);
+                window.location.href = '/frontend/index.html';
+            });
+        }
+    });
+</script>
 </body>
 
 </html>
