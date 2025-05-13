@@ -6,10 +6,13 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AssignmentSubmissionController;
+use Illuminate\Support\Facades\Log;
 
 
 
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        // \Log::info('Authenticated user:', [auth()->user()]);
         return $request->user();
     });
     
@@ -51,9 +54,12 @@ use App\Http\Controllers\AssignmentController;
       
     
             // Submit Assignments //
-            Route::post('assignments/{assignmentId}/submit', [AssignmentSubmissionController::class, 'submitAssignment']);
-            Route::get('assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissions']);
-            Route::get('/get/assignmentsList', [AssignmentController::class, 'getAssignmentsList']);
+            // Route::post('assignments/{assignmentId}/submit', [SubmissionController::class, 'submitAssignment']);
+            // Route::get('assignments/{assignmentId}/submissions', [SubmissionController::class, 'viewSubmissions']);
+            // Route::get('/getAdmins', [SubmissionController::class, 'getAdmins']);
+       
+
+            Route::get('/get/viewAssignments', [AssignmentSubmissionController::class, 'viewAssignments']);
        
 
 

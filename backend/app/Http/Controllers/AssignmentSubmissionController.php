@@ -1,12 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use App\Models\Student;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Http\Request;
 
 class AssignmentSubmissionController extends Controller
 {
@@ -29,97 +33,30 @@ class AssignmentSubmissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function submitAssignment(Request $request, $assignmentId)
+    public function store(Request $request)
     {
-        try {
-            Log::info('submitAssignment called', [
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            $request->validate([
-                'answer' => 'required|string',
-            ]);
-
-            // Check if the student is allowed to submit for this assignment
-            $assignment = Assignment::findOrFail($assignmentId);
-
-            if ($assignment->assigned_to != Auth::id()) {
-                return response()->json(['status' => false, 'message' => 'You are not assigned to this assignment.'], 403);
-            }
-
-            $submission = AssignmentSubmission::create([
-                'assignment_id' => $assignmentId,
-                'user_id' => Auth::id(),
-                'answer' => $request->answer,
-                'submitted_at' => now(),
-            ]);
-
-            Log::info('Assignment submitted', ['submission_id' => $submission->id]);
-
-            return response()->json(['status' => true, 'message' => 'Assignment submitted successfully.']);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to submit assignment', [
-                'error' => $e->getMessage(),
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to submit assignment.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        //
     }
 
     /**
      * Display the specified resource.
      */
-   public function viewSubmissions($assignmentId)
+    public function viewAssignments()
     {
-        try {
-            $assignment = Assignment::findOrFail($assignmentId);
+        // \Log::info('viewAssignments endpoint hit by user ID: ' . auth()->id());
 
-            // Check if the user is allowed to view this assignment's submissions
-            if (Auth::id() != $assignment->assigned_by && Auth::id() != $assignment->assigned_to) {
-                return response()->json(['status' => false, 'message' => 'You are not authorized to view these submissions.'], 403);
-            }
+        $assignments = Assignment::with(['user', 'student.student'])
+                        ->where('assigned_to', auth()->id())
+                        ->get();
 
-            $submissions = AssignmentSubmission::where('assignment_id', $assignmentId)->get();
+        // \Log::info('Assignments fetched:', $assignments->toArray());
 
-            return response()->json(['status' => true, 'submissions' => $submissions]);
-
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch submissions', [
-                'error' => $e->getMessage(),
-                'user_id' => Auth::id(),
-            ]);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to fetch submissions.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $assignments
+        ]);
     }
 
-    public function getAssignmentsList()
-    {
-        try {
-            // Assuming current user is a student
-            $assignments = Assignment::where('assigned_to', auth()->id())->get();
-
-            return response()->json($assignments);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to fetch assignments.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Show the form for editing the specified resource.

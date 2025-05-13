@@ -20,14 +20,14 @@ class Assignment extends Model
         'status'
     ];
 
-    public function user()
+    public function user() 
     {
-        return $this->belongsTo(User::class, 'assigned_by');
+        return $this->belongsTo(User::class, 'assigned_by'); // Assigned_by
     }
 
     public function student()
     {
-        return $this->belongsTo(User::class, 'assigned_to')->with('student');
+        return $this->belongsTo(User::class, 'assigned_to')->with('student'); // Assigned_to
     }
 
 }

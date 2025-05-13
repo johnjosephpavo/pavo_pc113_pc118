@@ -8,25 +8,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AssignmentSubmission extends Model
 {
     protected $table = "assignment_submissions";
-    
     use HasFactory;
 
     protected $fillable = [
         'assignment_id',
         'user_id',
         'answer',
-        'submitted_at',
+        'file_path',
     ];
 
-    // Relationship to the student who submitted
-    public function student()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    // Relationship to the original assignment
     public function assignment()
     {
         return $this->belongsTo(Assignment::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
+
 }
+

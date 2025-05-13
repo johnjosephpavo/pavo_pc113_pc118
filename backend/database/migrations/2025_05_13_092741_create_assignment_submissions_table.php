@@ -14,15 +14,12 @@ return new class extends Migration
         Schema::create('assignment_submissions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('assignment_id');
-            $table->unsignedBigInteger('user_id'); // student user_id (role 2)
-
+            $table->unsignedBigInteger('user_id'); // Student who submitted
             $table->text('answer')->nullable();
-            $table->timestamp('submitted_at')->nullable();
             $table->timestamps();
 
             $table->foreign('assignment_id')->references('id')->on('assignments')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
         });
     }
 
