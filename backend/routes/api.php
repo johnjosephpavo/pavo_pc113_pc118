@@ -10,11 +10,17 @@ use App\Http\Controllers\AssignmentSubmissionController;
 use Illuminate\Support\Facades\Log;
 
 
-
+    // Get authenticated user //
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         // \Log::info('Authenticated user:', [auth()->user()]);
         return $request->user();
     });
+    
+    // Get user with student //
+    Route::middleware('auth:sanctum')->get('/userRole', function (Request $request) {
+        return $request->user()->load('student'); 
+    });
+
     
     Route::get('/admin-dashboard', [StudentController::class, 'index']);
     Route::post('/register', [AuthController::class, 'register']);
