@@ -213,7 +213,7 @@
             <li class="nav-item d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
                 <i class="fa fa-user me-sm-1"></i>
-                <span class="d-sm-inline d-none">Admin</span>
+                <span class="d-sm-inline d-none"><h7 id="userRole">Loading...</h7></span>
               </a>
             </li>
             <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
@@ -447,7 +447,32 @@
         });
 
   </script>
-  
+
+<!-- topbar -->
+ <script>
+  fetch('http://127.0.0.1:8000/api/userRole', {
+    headers: {
+      'Accept': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('token')
+    },
+    credentials: 'same-origin' // Ensure cookies (like session or sanctum token) are sent
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('User not authenticated');
+    return response.json();
+  })
+  .then(user => {
+    const role = user.role;
+    const display = role == 1 ? user.email : user.student.first_name;
+    document.getElementById('userRole').textContent = display;
+  })
+  .catch(error => {
+    console.error('Error fetching user:', error);
+    document.getElementById('userRole').textContent = 'Guest';
+  });
+</script>
+ <!-- end of topbar -->
+
   <!-- Hide sidebar using user role -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {

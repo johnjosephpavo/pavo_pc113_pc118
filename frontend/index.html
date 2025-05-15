@@ -3,152 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-      
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(-45deg, #74ebd5, #ACB6E5, #fbc2eb, #a6c1ee);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            width: 90%;
-            max-width: 350px;
-            padding: 40px 30px;
-            animation: fadeInUp 1s ease both;
-        }
-
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h2 {
-            text-align: center;
-            color: #000000;
-            margin-bottom: 20px;
-        }
-
-        input {
-            background-color: rgba(255, 255, 255, 0.3);
-            color: #000000;
-            outline: none;
-            width: 93%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        input::placeholder {
-            color: #555;
-        }
-
-        button {
-            background-color: #ffffff;
-            color: rgb(0, 0, 0);
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        button:hover {
-            background-color: #f68104;
-        }
-
-        #message {
-            text-align: center;
-            margin-top: 10px;
-            color: #ffb3b3;
-        }
-
-        @media (max-width: 400px) {
-            .login-container {
-                padding: 30px 20px;
-            }
-        }
-    </style>
+    <title>Task Submission System</title>
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/custom.css">
 </head>
 <body>
 
-    <div class="login-container">
-        <h2>Login</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <input type="email" id="email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-        <p id="message"></p>
+    <div class="background-image"></div>
+    <div class="background-overlay"></div>
+    <div id="particles-js"></div>
+
+    <div class="content">
+        <h1 class="mb-4">Task Submission System</h1>
+        <div>
+            <a href="/frontend/login.html" class="btn btn-custom glassy-button">Login</a>
+        </div>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const messageEl = document.getElementById('message');
-
-            try {
-                const response = await fetch('http://127.0.0.1:8000/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Login Successful!');
-                    localStorage.setItem('token', data.token);
-                    window.location.href = 'dashboard.html';
-                } else {
-                    messageEl.innerText = data.message || 'Login failed';
-                }
-            } catch (err) {
-                messageEl.innerText = 'Error connecting to server';
-            }
-        });
-    </script>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-nest.js@2.0.1/dist/canvas-nest.min.js"></script>
+    <script src="js/scripts.js"></script>
+     
 </body>
+
 </html>
