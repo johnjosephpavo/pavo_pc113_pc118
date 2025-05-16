@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Log;
     });
 
     
-    Route::get('/admin-dashboard', [StudentController::class, 'index']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -32,6 +31,7 @@ use Illuminate\Support\Facades\Log;
         
         // Users //    
         Route::get('/usersList', [AuthController::class, 'list']); 
+         Route::get('/getUserProfile', [AuthController::class, 'getUserProfile']); 
         Route::post('/createusers', [AuthController::class, 'store']);
         Route::get('/get/users/{id}', [AuthController::class, 'edit']);
         Route::get('/getUserById/{id}', [AuthController::class, 'getUserById']);

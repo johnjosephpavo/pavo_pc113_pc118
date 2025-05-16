@@ -214,26 +214,6 @@ class AuthController extends Controller
         return response()->json($user, 200);
     }
 
-    public function register(Request $request)
-    {
-        $validatedData = $request->validate([
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        $user = User::create([
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user,
-            'token' => $token,
-        ], 201);
-    }
    
     public function getUserById($id)
     {
@@ -305,6 +285,82 @@ class AuthController extends Controller
         }   
     }
 
+    public function getUserProfile(Request $request)
+    {
+        // Assuming the user is authenticated
+        $user = $request->user();
+
+        // Load the student details if the role is 2
+        if ($user->role == 2) {
+            $user->load('student');
+        }
+
+        return response()->json($user);
+    }
+
     
+
+    public function register(Request $request)
+    {
+        \Log::info('Register request received.', $request->all());
+
+        $validated = $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'profile_image' => 'nullable|image|max:2048',
+        ]);
+
+        try {
+            // Assign default role (2 for student)
+            $validated['role'] = 2;
+
+            \Log::info('Validation successful.', [
+                'email' => $validated['email'],
+                'role' => $validated['role']
+            ]);
+
+            // Handle profile image upload
+            if ($request->hasFile('profile_image')) {
+                $filename = time() . '.' . $request->file('profile_image')->getClientOriginalExtension();
+                $path = $request->file('profile_image')->storeAs('profile_images', $filename, 'public');
+                $validated['profile_image'] = $path;
+
+                \Log::info('Profile image uploaded.', ['path' => $path]);
+            }
+
+            $validated['password'] = bcrypt($validated['password']);
+            $user = User::create($validated);
+
+            \Log::info('User created.', ['user_id' => $user->id]);
+
+            // If Student, create Student record
+            $student = Student::create([
+                'user_id' => $user->id,
+                'first_name' => $request->input('first_name', ''),
+                'last_name' => $request->input('last_name', ''),
+                'age' => $request->input('age'),
+                'gender' => $request->input('gender', ''),
+                'address' => $request->input('address', ''),
+                'course' => $request->input('course', ''),
+                'contact_number' => $request->input('contact_number', ''),
+            ]);
+
+            \Log::info('Student record created.', ['student_id' => $student->id]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User registered successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Registration Error:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Registration failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 
 }
