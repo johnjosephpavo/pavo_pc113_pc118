@@ -21,7 +21,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Pavo's UI Dashboard 
+     Task Submission System Dashboard | Profile 
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800" rel="stylesheet" />
@@ -50,7 +50,7 @@
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href="../frontend/dashboard.html" target="_blank">
+      <a class="navbar-brand m-0" href="../frontend/dashboard.html">
         <img src="../frontend/logo-ct-dark.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">Dashboard</span>
       </a>
@@ -211,7 +211,7 @@
           <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
+              <a href="profile.html" class="nav-link text-body font-weight-bold px-0">
                 <i class="fa fa-user me-sm-1"></i>
                 <span class="d-sm-inline d-none"><h7 id="userRole">Loading...</h7></span>
               </a>
@@ -266,9 +266,7 @@
                     <div class="col-md-8">
                         <input type="hidden" id="user_id" name="user_id" value="">
                         <div class="row">
-                            <!-- <div class="col-md-6">
-                                <strong>Name:</strong><h6 id="name"></h6>
-                            </div> -->
+                            
                             <div class="col-md-12">
                                 <strong>Email:</strong><h6 id="email"></h6>
                             </div>
@@ -408,45 +406,78 @@
    }
   </script>
 
-  <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    const backendBaseUrl = 'http://127.0.0.1:8000'; // Laravel server
+<!-- Fetching all Data of users -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const backendBaseUrl = 'http://127.0.0.1:8000'; // Laravel server
 
-            fetch('http://127.0.0.1:8000/api/user', {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.json();
-            })
-            .then(user => {
-                // document.getElementById('name').textContent = user.name;
-                document.getElementById('email').textContent = user.email;
-                const profileImageUrl = user.profile_image 
-                  ? `${backendBaseUrl}/images/${user.profile_image}`
-                  : 'default-avatar.png'; // Fallback image in frontend folder
+        fetch('http://127.0.0.1:8000/api/getUserProfile', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json();
+        })
+        .then(user => {
+            // Display email
+            document.getElementById('email').textContent = user.email;
 
-                const profileImageElement = document.getElementById('profile_image');
-                const profileImageLink = document.getElementById('profile-image');
+            // Set Profile Image
+            const profileImageUrl = user.profile_image 
+                ? `${backendBaseUrl}/storage/${user.profile_image}`
+                : `${backendBaseUrl}/images/default_avatar.jpg`; // Fallback image
 
-                profileImageElement.src = profileImageUrl;
-                profileImageElement.alt = `${user.name}'s Profile Image`;
-                profileImageLink.href = profileImageUrl;
-            })
-            .catch(error => {
-                console.error('Error fetching user:', error);
-            });
+            const profileImageElement = document.getElementById('profile_image');
+            const profileImageLink = document.getElementById('profile-image');
+            profileImageElement.src = profileImageUrl;
+            profileImageElement.alt = `${user.name}'s Profile Image`;
+            profileImageLink.href = profileImageUrl;
 
+            // Display additional information if role is 2
+            if (user.role === 2 && user.student) {
+                const student = user.student;
+                const userDetails = `
+                    <div class="col-md-6">
+                        <strong>First Name:</strong><h6>${student.first_name}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Last Name:</strong><h6>${student.last_name}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Age:</strong><h6>${student.age}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Gender:</strong><h6>${student.gender}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Address:</strong><h6>${student.address}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Course:</strong><h6>${student.course}</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Contact Number:</strong><h6>${student.contact_number}</h6>
+                    </div>
+                `;
+
+                // Insert user details in the profile section
+                document.querySelector('.col-md-8 .row').insertAdjacentHTML('beforeend', userDetails);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user:', error);
         });
+    });
+</script>
+<!-- End of Fetching all Data of users -->
 
-  </script>
 
 <!-- topbar -->
  <script>

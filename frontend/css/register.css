@@ -1,0 +1,118 @@
+   body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, rgba(105, 4, 56, 0.3), rgba(0, 0, 0, 0.3), rgba(62, 10, 10, 0.1));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+      .login-container {
+            background: rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            width: 90%;
+            max-width: 700px; 
+            padding: 40px 30px;
+            animation: fadeInUp 1s ease both;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .login-container:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        input {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #000000;
+            outline: none;
+            width: 93%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+       .register-button {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .register-button:hover {
+            background-color: #f68104;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 10px;
+            color: #ffb3b3;
+        }
+
+        @media (max-width: 400px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+
+         #cancel-button {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        #cancel-button:hover {
+            background-color: #f68104;
+        }

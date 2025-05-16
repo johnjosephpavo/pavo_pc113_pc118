@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Task Submission System Dashboard | Register</title>
+  <link rel="stylesheet" href="/frontend/css/register.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+    <div class="card login-container mt-5 mx-auto">
+    <div class="card-header">
+        <a href="/frontend/index.html" id="cancel-button" style="text-decoration:none ;">&larr; Back</a>
+        <h4 class="text-center w-100">Registration</h4>
+    </div>
+
+    <div class="card-body">
+       <div id="alertRegisterMessage" class="alert d-none"></div>
+
+        <form id="registerForm" enctype="multipart/form-data" novalidate action="javascript:void(0);">
+        <div class="row mb-3">
+            <div class="col-md-6">
+            <label for="profile_image" class="form-label">Profile Image</label>
+            <input type="file" class="form-control" id="profile_image" name="profile_image">
+            </div>
+            
+            <div class="col-md-6">
+            <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+            <input type="email" class="form-control" id="email" name="email" required placeholder="Email...">
+            </div>
+        </div>
+
+        <div id="studentFields" class="row">
+            <div class="col-md-6 mb-3">
+            <label class="form-label">First Name <span style="color: red;">*</span></label>
+            <input type="text" class="form-control" id="first_name" name="first_name" required placeholder="First Name...">
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Last Name <span style="color: red;">*</span></label>
+            <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="Last Name...">
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Age <span style="color: red;">*</span></label>
+            <input type="text" class="form-control" id="age" name="age" required placeholder="Age...">
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Gender <span style="color: red;">*</span></label>
+            <select class="form-control" id="gender" name="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            </div>
+
+            <div class="col-md-12 mb-3">
+            <label class="form-label">Address <span style="color: red;">*</span></label>
+            <textarea class="form-control" id="address" name="address" required></textarea>
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Course <span style="color: red;">*</span></label>
+            <select class="form-control" id="course" name="course" required>
+                <option value="" disabled selected>Select Course</option>
+                <option value="BSIT">BSIT</option>
+                <option value="BSCS">BSCS</option>
+                <option value="BSBA">BSBA</option>
+                <option value="BEED">BEED</option>
+                <option value="BSED">BSED</option>
+                <option value="BSED-Math">BSED-Math</option>
+                <option value="BSN">BSN</option>
+            </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Contact Number <span style="color: red;">*</span></label>
+            <input type="text" class="form-control" id="contact_number" name="contact_number" required placeholder="Contact Number...">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password <span style="color: red;">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" required minlength="8" placeholder="Password...">
+        </div>
+
+        <div class="card-footer">
+             <div class="d-grid">
+                <button type="submit" class="register-button">Register</button>
+            </div>
+        </div>
+       
+        </form>
+    </div>
+    </div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#registerForm');
+    const messageDiv = document.getElementById('alertRegisterMessage');
+    console.log('DOM is loaded properly!');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+    
+        try {
+
+      let formData = new FormData();
+      formData.append('email', document.getElementById('email').value);
+      formData.append('password', document.getElementById('password').value);
+
+      const profileImageInput = document.getElementById('profile_image');
+      if (profileImageInput.files.length > 0) {
+        formData.append('profile_image', profileImageInput.files[0]);
+      }
+
+      // Append student-specific fields
+      formData.append('first_name', document.getElementById('first_name').value);
+      formData.append('last_name', document.getElementById('last_name').value);
+      formData.append('age', document.getElementById('age').value);
+      formData.append('gender', document.getElementById('gender').value);
+      formData.append('address', document.getElementById('address').value);
+      formData.append('course', document.getElementById('course').value);
+      formData.append('contact_number', document.getElementById('contact_number').value);
+
+      fetch('http://127.0.0.1:8000/api/register', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(async response => {
+        const res = await response.json();
+        console.log('Parsed JSON:', res);
+
+        if (res.status) {
+                  // Show success message
+                  messageDiv.classList.remove('d-none', 'alert-danger');
+                  messageDiv.classList.add('alert', 'alert-success');
+                  messageDiv.innerText = "User registered successfully!";
+  
+                  setTimeout(() => {
+                      window.location.href = 'login.html';
+                  }, 500);
+              } else {
+                  messageDiv.classList.remove('d-none', 'alert-success');
+                  messageDiv.classList.add('alert', 'alert-danger');
+                  messageDiv.innerText = res.message || "Failed to register user.";
+                  messageDiv.style.display = 'block';
+              }
+      })
+      .catch(error => {
+        console.error('Error creating user:', error);
+        messageDiv.classList.remove('d-none', 'alert-success');
+        messageDiv.classList.add('alert', 'alert-danger');
+        messageDiv.innerText = "An error occurred. Please try again.";
+      });
+      } catch (e) {
+    console.error('JS Error in form submit:', e);
+  }
+    });
+  });
+</script>
+
+
+
+
+<script>
+        document.getElementById('contact_number').addEventListener('input', function(event) {
+            let input = event.target;
+            let value = input.value;
+            if (value.length > 11) {
+                input.value = value.slice(0, 11); 
+            }
+        });    
+</script>
+
+</body>
+</html>
+
+
+

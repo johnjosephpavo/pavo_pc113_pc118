@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title> Task Submission System Dashboard | Login</title>
     <link rel="stylesheet" href="/frontend/css/login.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -43,9 +44,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('Login Successful!');
-                    localStorage.setItem('token', data.token);
-                    window.location.href = 'dashboard.html';
+                    Swal.fire({
+                        title: 'Login Successful!',
+                        text: 'You have been successfully logged in.',
+                        icon: 'success',
+                        confirmButtonText: 'Proceed'
+                    }).then(() => {
+                        localStorage.setItem('token', data.token);
+                        window.location.href = 'dashboard.html';
+                    });
                 } else {
                     messageEl.innerText = data.message || 'Login failed';
                 }
@@ -55,5 +62,7 @@
         });
     </script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </body>
 </html>
