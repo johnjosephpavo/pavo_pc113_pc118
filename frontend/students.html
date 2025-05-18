@@ -36,6 +36,9 @@
   <!-- Nepcha Analytics (nepcha.com) -->
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   
 </head>
 
@@ -240,6 +243,7 @@
           <div class="card mb-4">
             <div class="card-header pb-0">
               <h6>Students table</h6>
+              <button id="exportPDF" class="btn btn-warning">Export PDF</button>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
@@ -690,14 +694,58 @@
 <!-- End of Script for submitting the form in students edit -->
 
 <!-- security -->
-  <script>
+<script>
       document.addEventListener('DOMContentLoaded', () => {
           const token = localStorage.getItem('token');
           if (!token) {
               window.location.href = '/frontend/index.html';
           } 
       });
-  </script>
-</body>
+</script>
+<!-- end of security -->
 
+<!-- Export -->
+<script>
+  document.getElementById('exportPDF').addEventListener('click', function() {
+    fetch('http://127.0.0.1:8000/api/students/export-pdf', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'students_list.pdf'; // filename
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      Swal.fire({
+        icon: 'success',
+        title: 'Download Complete',
+        text: 'The students list PDF has been downloaded.',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.reload();
+      });
+    })
+    .catch(error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: 'Failed to download PDF. Please try again.',
+      });
+      console.error('Export PDF error:', error);
+    });
+  });
+</script>
+<!-- End of Export -->
+
+</body>
 </html>
