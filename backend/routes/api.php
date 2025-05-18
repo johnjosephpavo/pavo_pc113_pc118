@@ -63,11 +63,9 @@ use Illuminate\Support\Facades\Log;
       
     
             // Submit Assignments //
-            // Route::post('assignments/{assignmentId}/submit', [SubmissionController::class, 'submitAssignment']);
-            // Route::get('assignments/{assignmentId}/submissions', [SubmissionController::class, 'viewSubmissions']);
-            // Route::get('/getAdmins', [SubmissionController::class, 'getAdmins']);
-       
-
+            Route::post('/assignment/submit', [AssignmentSubmissionController::class, 'submit']);
+            
+            // View Assignments fron role 2 (students) //
             Route::get('/get/viewAssignments', [AssignmentSubmissionController::class, 'viewAssignments']);
        
 

@@ -33,11 +33,44 @@ class AssignmentSubmissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function submit(Request $request)
     {
-        //
-    }
+        try {
+            $request->validate([
+                'assignment_id' => 'required|exists:assignments,id',
+                'answer' => 'nullable|string',
+            ]);
 
+            $userId = auth()->id();
+            Log::info("User $userId started assignment submission", ['assignment_id' => $request->assignment_id]);
+
+            AssignmentSubmission::create([
+                'assignment_id' => $request->assignment_id,
+                'user_id' => $userId,
+                'answer' => $request->answer,
+            ]);
+
+            // Update assignment status to 'Submitted' (1)
+            Assignment::where('id', $request->assignment_id)->update(['status' => 1]);
+            Log::info("Assignment marked as submitted", ['assignment_id' => $request->assignment_id]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Assignment submitted successfully',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Assignment submission failed', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to submit assignment. Please try again.',
+            ], 500);
+        }
+    }
     /**
      * Display the specified resource.
      */
