@@ -41,15 +41,20 @@ class AssignmentSubmissionController extends Controller
     /**
      * Display the specified resource.
      */
+    
     public function viewAssignments()
     {
-        // \Log::info('viewAssignments endpoint hit by user ID: ' . auth()->id());
+        $user = auth()->user();
 
-        $assignments = Assignment::with(['user', 'student.student'])
-                        ->where('assigned_to', auth()->id())
-                        ->get();
-
-        // \Log::info('Assignments fetched:', $assignments->toArray());
+        if ($user->role == 1) {
+            // Admin: show all assignments (or only ones they assigned if you prefer)
+            $assignments = Assignment::with(['user', 'student.student'])->get();
+        } else {
+            // Student: show only their assigned assignments
+            $assignments = Assignment::with(['user', 'student.student'])
+                            ->where('assigned_to', $user->id)
+                            ->get();
+        }
 
         return response()->json([
             'status' => 'success',
