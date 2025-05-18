@@ -97,7 +97,7 @@
     </div>
     </div>
 
-
+<!-- Register form -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#registerForm');
@@ -163,10 +163,9 @@
     });
   });
 </script>
+<!-- End of Register form -->
 
-
-
-
+<!-- Script for contact number -->
 <script>
         document.getElementById('contact_number').addEventListener('input', function(event) {
             let input = event.target;
@@ -176,7 +175,32 @@
             }
         });    
 </script>
+<!-- End of Script for contact number -->
 
+<!-- Redirect to dashboard if already logged in -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      fetch('http://127.0.0.1:8000/api/user', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => {
+        if (res.ok) {
+          // Already logged in
+          window.location.href = '/frontend/dashboard.html';
+        }
+      });
+    }
+  });
+</script>
+<!--End of Redirect to dashboard if already logged in -->
 </body>
 </html>
 
