@@ -9,12 +9,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Student;
 use App\Models\Role;
+use App\Notifications\ApiResetPasswordNotification;
 
 class User extends Authenticatable
 {
     protected $table = "users";
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens ;
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ApiResetPasswordNotification($token));
+    }
 
     /**
      * The attributes that are mass assignable.

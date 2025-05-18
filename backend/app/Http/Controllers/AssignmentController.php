@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Assignment;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class AssignmentController extends Controller
 {
@@ -39,7 +41,7 @@ class AssignmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function createAssignment(Request $request)
+   public function createAssignment(Request $request)
     {
         try {
             Log::info('createAssignment called', [
@@ -65,8 +67,14 @@ class AssignmentController extends Controller
 
             Log::info('Assignment created', ['assignment_id' => $assignment->id]);
 
+            // Send email
+            $recipient = User::find($request->assigned_to);
+            if ($recipient) {
+                $this->sendAssignmentEmail($recipient->email, $recipient->student->first_name ?? 'Student', $assignment);
+            }
+
             return response()->json(['status' => true, 'message' => 'Assignment created.']);
-            
+
         } catch (\Exception $e) {
             Log::error('Failed to create assignment', [
                 'error' => $e->getMessage(),
@@ -79,6 +87,43 @@ class AssignmentController extends Controller
                 'message' => 'Failed to create assignment.',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    protected function sendAssignmentEmail($toEmail, $toName, $assignment)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com'; 
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'jj.pavo@mlgcl.edu.ph'; 
+            $mail->Password   = 'dypadlwmytbkfqdt'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            // Recipients
+            $mail->setFrom('jj.pavo@mlgcl.edu.ph', 'Assignment Portal');
+            $mail->addAddress($toEmail, $toName);
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'New Assignment: ' . $assignment->title;
+            $mail->Body    = "
+                <p>Hello {$toName},</p>
+                <p>You have been assigned a new assignment titled <strong>{$assignment->title}</strong>.</p>
+                <p><strong>Due Date:</strong> {$assignment->due_date}</p>
+                <p><strong>Description:</strong><br>{$assignment->description}</p>
+                <p>Please log in to your account to view more details.</p>
+                <br><p>Regards,<br><strong>Task Submission System</strong></p>
+            ";
+
+            $mail->send();
+            \Log::info('Assignment email sent to ' . $toEmail);
+        } catch (Exception $e) {
+            \Log::error("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
         }
     }
 

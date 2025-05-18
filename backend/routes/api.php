@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\Log;
     
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
 
 
     

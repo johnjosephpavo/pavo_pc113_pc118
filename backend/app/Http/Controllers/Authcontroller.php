@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Password;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use App\Mail\ResetPasswordMail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -298,7 +303,6 @@ class AuthController extends Controller
         return response()->json($user);
     }
 
-    
 
     public function register(Request $request)
     {
@@ -362,5 +366,127 @@ class AuthController extends Controller
     }
 
 
+    public function sendResetLink(Request $request)
+    {
+        try {
+            Log::info('Password reset request received', ['email' => $request->email]);
+
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users,email',
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('Password reset validation failed', ['errors' => $validator->errors()]);
+                return response()->json(['status' => false, 'message' => 'Invalid email address'], 422);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json(['status' => false, 'message' => 'User not found'], 404);
+            }
+
+            $token = Password::createToken($user);
+
+            Mail::to($user->email)->send(new ResetPasswordMail($token, $user->email));
+
+            Log::info('Custom password reset email sent', ['email' => $request->email]);
+
+            return response()->json(['status' => true, 'message' => 'Reset link sent to your email.']);
+
+        } catch (\Exception $e) {
+            Log::error('Exception occurred while sending password reset link', [
+                'email' => $request->email,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong while sending reset link.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            Log::info('Password reset attempt', ['email' => $request->email]);
+
+            $validator = Validator::make($request->all(), [
+                'token' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|min:8|confirmed',
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('Password reset validation failed', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => bcrypt($password)
+                    ])->save();
+
+                    Log::info('User password reset successfully', ['user_id' => $user->id]);
+                }
+            );
+
+            if ($status === Password::PASSWORD_RESET) {
+                return response()->json(['status' => true, 'message' => 'Password reset successfully.']);
+            } else {
+                Log::error('Password reset failed', ['status' => $status]);
+                return response()->json(['status' => false, 'message' => __($status)], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Exception occurred during password reset', [
+                'email' => $request->email,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong while resetting password.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    protected function sendEmail($toEmail, $toName, $subject, $htmlBody)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com'; 
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'jj.pavo@mlgcl.edu.ph'; 
+            $mail->Password   = 'dypadlwmytbkfqdt'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            // Recipients
+            $mail->setFrom('jj.pavo@mlgcl.edu.ph', 'Task Submission System');
+            $mail->addAddress($toEmail, $toName);
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $htmlBody;
+
+            $mail->send();
+            \Log::info("Email sent successfully to {$toEmail} with subject: {$subject}");
+        } catch (Exception $e) {
+            \Log::error("Email could not be sent to {$toEmail}. Mailer Error: {$mail->ErrorInfo}");
+        }
+    }
 
 }
