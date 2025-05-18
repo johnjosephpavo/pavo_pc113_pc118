@@ -67,6 +67,9 @@ use Illuminate\Support\Facades\Log;
             
             // View Assignments fron role 2 (students) //
             Route::get('/get/viewAssignments', [AssignmentSubmissionController::class, 'viewAssignments']);
+
+            Route::get('/students/export-pdf', [StudentController::class, 'exportPDF']);
+
        
 
 

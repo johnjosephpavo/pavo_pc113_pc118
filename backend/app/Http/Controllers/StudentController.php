@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use PDF; 
 
 class StudentController extends Controller
 {
@@ -117,5 +118,21 @@ class StudentController extends Controller
             'user' => $student->user, //include user
         ], 200);
     }
+
+
+
+
+    public function exportPDF()
+    {
+        // load students with their user relation
+        $students = Student::with('user')->get();
+
+        $pdf = PDF::loadView('exports.students_pdf', [
+            'students' => $students,
+        ]);
+
+        return $pdf->download('students_list.pdf');
+    }
+
 
 }
