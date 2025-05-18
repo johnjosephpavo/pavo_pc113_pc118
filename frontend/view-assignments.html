@@ -535,6 +535,20 @@
                         ? `${assignment.student.student.first_name} ${assignment.student.student.last_name}`
                         : 'N/A';
 
+                    let statusName = '';
+                    switch(assignment.status){
+                      case '0':
+                        case 0: 
+                              statusName = 'Pending';
+                              break;
+                      case '1':
+                        case 1:
+                              statusName = 'Submitted';
+                              break;
+                      default: 
+                              statusName = 'Unknown';
+                    }
+
                     const row = document.createElement('tr');
 
                     row.innerHTML = `
@@ -543,7 +557,9 @@
                         <td>${assignment.title}</td>
                         <td>${assignment.description}</td>
                         <td>${new Date(assignment.due_date).toLocaleDateString()}</td>
-                        <td>${assignment.status}</td>
+                        <td>
+                          <span class="badge ${statusName === 'Pending' ? 'bg-danger' : 'bg-success'}">${statusName}</span>
+                        </td>
                         <td>
                             <a href="/submit-assignment/${assignment.id}" class="btn btn-sm btn-success">Submit</a>
                         </td>
