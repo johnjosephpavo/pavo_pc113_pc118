@@ -7,7 +7,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Models\Student;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 
 
     // Get authenticated user //
@@ -20,6 +25,19 @@ use Illuminate\Support\Facades\Log;
     Route::middleware('auth:sanctum')->get('/userRole', function (Request $request) {
         return $request->user()->load('student'); 
     });
+
+    // Get all Data //
+    Route::middleware('auth:sanctum')->get('/dashboard-stats', function () {
+        return response()->json([
+            'users' => User::count(),
+            'students' => Student::count(),
+            'assignments' => Assignment::count(),
+            'submissions' => AssignmentSubmission::count(),
+        ]);
+    });
+
+    // Dashboard Controller//
+    Route::get('/activities/recent-submissions', [DashboardController::class, 'recentSubmissions']);
 
     
     Route::post('/register', [AuthController::class, 'register']);

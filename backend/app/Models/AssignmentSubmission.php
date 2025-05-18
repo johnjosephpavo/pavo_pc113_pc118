@@ -14,7 +14,6 @@ class AssignmentSubmission extends Model
         'assignment_id',
         'user_id',
         'answer',
-        'file_path',
     ];
 
     public function assignment()
