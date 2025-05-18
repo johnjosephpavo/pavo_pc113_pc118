@@ -228,7 +228,7 @@ class AssignmentController extends Controller
 
     public function getAssignmentById($id)
     {
-        $assignment = Assignment::with('user')->find($id); // loads assignment and user
+        $assignment = Assignment::with('user', 'student')->find($id); // loads assignment and user and student
     
         if (!$assignment) {
             return response()->json([
