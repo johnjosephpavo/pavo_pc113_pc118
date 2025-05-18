@@ -436,6 +436,9 @@
         <div class="form-check form-switch ps-0">
           <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
         </div>
+        <div class="mt-3">
+          <button class="btn btn-danger w-100" onclick="resetTheme()">Reset to Default</button>
+        </div>
       </div>
     </div>
   </div>
@@ -933,14 +936,16 @@
 <!-- End of Showing the list of all the assignments -->
 
 <!-- security -->
-  <script>
+<script>
       document.addEventListener('DOMContentLoaded', () => {
           const token = localStorage.getItem('token');
           if (!token) {
               window.location.href = '/frontend/index.html';
           } 
       });
-  </script>
+</script>
+
+<script src="js/configuration.js"></script>
 </body>
 
 </html>
