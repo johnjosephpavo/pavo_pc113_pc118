@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\AssignmentExtensionRequest;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 
@@ -79,15 +81,26 @@ class AssignmentSubmissionController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role == 1) {
-            // Admin: show all assignments (or only ones they assigned if you prefer)
-            $assignments = Assignment::with(['user', 'student.student'])->get();
-        } else {
-            // Student: show only their assigned assignments
-            $assignments = Assignment::with(['user', 'student.student'])
-                            ->where('assigned_to', $user->id)
-                            ->get();
+        $assignmentsQuery = Assignment::with(['user', 'student.student']);
+
+        // If not admin, show only their own assignments
+        if ($user->role != 1) {
+            $assignmentsQuery->where('assigned_to', $user->id);
         }
+
+        // Add withCount to track if the current user has already requested an extension
+        $assignmentsQuery->withCount([
+            'extensionRequests as extension_requested' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }
+        ]);
+
+        $assignments = $assignmentsQuery->get();
+
+        // Add dynamic is_expired field
+        $assignments->each(function ($assignment) {
+            $assignment->is_expired = Carbon::now()->gt(Carbon::parse($assignment->due_date));
+        });
 
         return response()->json([
             'status' => 'success',

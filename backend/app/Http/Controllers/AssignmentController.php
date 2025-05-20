@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Assignment;
+use App\Models\AssignmentExtensionRequest;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -236,7 +237,11 @@ class AssignmentController extends Controller
                 'message' => 'Assignment not found'
             ], 404);
         }
-    
+        
+        // Add dynamic is_expired field
+        $assignments->each(function ($assignment) {
+            $assignment->is_expired = Carbon::now()->gt(Carbon::parse($assignment->due_date));
+        });
         return response()->json([
             'status' => true,
             'assignment' => $assignment,
@@ -259,24 +264,14 @@ class AssignmentController extends Controller
         }
     }
 
-    // public function getAdmins()
-    // {
-    //     try {
-    //         // Fetch all users with role 1 (Admin), including the currently logged-in user if needed
-    //         $admins = User::where('role', 1)->get();
+   
 
-    //         return response()->json([
-    //             'status' => true,
-    //             'admins' => $admins
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Failed to fetch admins.',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
 
+  
+
+
+   
+
+   
 
 }

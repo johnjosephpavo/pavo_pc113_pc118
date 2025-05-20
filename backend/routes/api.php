@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
+use App\Http\Controllers\AssignmentsExtensionController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
@@ -76,8 +77,12 @@ use App\Models\AssignmentSubmission;
         Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
         Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
         Route::delete('/delete/assignments/{id}', [AssignmentController::class, 'destroy']);
-        
-        
+
+        // Request Extension //
+        Route::post('/assignments/{id}/request-extension', [AssignmentsExtensionController::class, 'requestExtension']);
+        Route::post('/extensions/{id}/approve', [AssignmentsExtensionController::class, 'approveExtension']);
+        Route::post('/extensions/{id}/deny', [AssignmentsExtensionController::class, 'denyExtension']);
+    
       
     
             // Submit Assignments //
@@ -86,6 +91,7 @@ use App\Models\AssignmentSubmission;
             // View Assignments fron role 2 (students) //
             Route::get('/get/viewAssignments', [AssignmentSubmissionController::class, 'viewAssignments']);
 
+            // Export Students //
             Route::get('/students/export-pdf', [StudentController::class, 'exportPDF']);
 
        

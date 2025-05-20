@@ -83,4 +83,8 @@ class User extends Authenticatable
     }
 
 
+    public function extensionRequests()
+    {
+        return $this->hasMany(AssignmentExtensionRequest::class);
+    }
 }
