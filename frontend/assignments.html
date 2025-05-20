@@ -254,9 +254,8 @@
                                       <th class="col">Title</th>
                                       <th class="col">Description</th>
                                       <th class="col">Due Date</th>
-                                      <!-- <th class="col">Requested New Due Date</th>
-                                      <th class="col">Reason</th> -->
                                       <th class="col">Status</th>
+                                      <th class="col">Requests</th>
                                       <th class="col">Action</th>
                                   </tr>
                               </thead>
@@ -475,6 +474,22 @@
     </div>
   </div>
     <!-- {{-- End of Delete Confirmation Modal --}} -->
+
+    <!-- Request Extension -->
+  <div class="modal fade" id="extensionRequestModal" tabindex="-1" aria-labelledby="extensionRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="extensionRequestModalLabel">Extension Requests</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="requestModalBody">
+          <!-- Dynamic request list will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
  <!--   Core JS Files   -->
@@ -858,29 +873,34 @@
                           : 'N/A';
 
                         const row = `<tr>
-                            <td>${assignment.id}</td>
-                            <td>${assignedTo}</td>
-                            <td>${assignment.title}</td>
-                            <td>${assignment.description}</td>
-                            <td>${assignment.due_date}</td>
-                            <td>
-                               <span class="badge ${statusName === 'Pending' ? 'bg-warning' : statusName === 'Submitted' ? 'bg-success' : 'bg-danger'}">${statusName}</span>
-                            </td>
-                            <td>
-
-                              <button class="btn btn-info btn-sm showAssignment me-2" data-id="${assignment.id}">
-                                  <i class="fa fa-eye"></i> Show
-                              </button>
-
-
-                                <button id="showEditFormButton" class="showEditFormButton btn btn-warning btn-sm me-2" data-id="${assignment.id}" title="Edit Button">
-                                    <i class="fa fa-solid fa-edit"></i> Edit
-                                </button>
-                                <a class="deleteAssignment btn btn-danger btn-sm" data-assignment-id="${assignment.id}" title="Delete Button">
-                                    <i class="fa fa-solid fa-trash"></i> Delete
-                                </a>
-                            </td>
-                        </tr>`;
+                                        <td>${assignment.id}</td>
+                                        <td>${assignedTo}</td>
+                                        <td>${assignment.title}</td>
+                                        <td>${assignment.description}</td>
+                                        <td>${assignment.due_date}</td>
+                                        <td>
+                                          <span class="badge ${statusName === 'Pending' ? 'bg-warning' : statusName === 'Submitted' ? 'bg-success' : 'bg-danger'}">${statusName}</span>
+                                        </td>
+                                        <td>
+                                          ${assignment.extension_requests && assignment.extension_requests.length > 0
+                                              ? `<button class="btn btn-primary btn-sm viewRequestsBtn" data-id="${assignment.id}">
+                                                  <i class="fa fa-clock"></i> View Request
+                                                </button>`
+                                              : '<span class="text-muted">No Request</span>'
+                                          }
+                                        </td>
+                                        <td>
+                                          <button class="btn btn-info btn-sm showAssignment me-2" data-id="${assignment.id}">
+                                              <i class="fa fa-eye"></i> Show
+                                          </button>
+                                          <button class="showEditFormButton btn btn-warning btn-sm me-2" data-id="${assignment.id}" title="Edit Button">
+                                              <i class="fa fa-solid fa-edit"></i> Edit
+                                          </button>
+                                          <a class="deleteAssignment btn btn-danger btn-sm" data-assignment-id="${assignment.id}" title="Delete Button">
+                                              <i class="fa fa-solid fa-trash"></i> Delete
+                                          </a>
+                                        </td>
+                                    </tr>`;
 
                         table.innerHTML += row;
                     }
@@ -936,6 +956,113 @@
               }
           });
 
+
+
+          // Show Request Extension
+          document.getElementById('assignmentsTable').addEventListener('click', function (event) {
+            const requestBtn = event.target.closest('.viewRequestsBtn');
+            if (requestBtn) {
+                const assignmentId = requestBtn.getAttribute('data-id');
+
+                fetch(`http://127.0.0.1:8000/api/show/assignments/${assignmentId}`, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status && Array.isArray(data.extension_requests) && data.extension_requests.length > 0) {
+
+                        const container = document.getElementById('requestModalBody');
+                        container.innerHTML = '';
+
+                        data.extension_requests.forEach(req => {
+                            const card = document.createElement('div');
+                            card.classList.add('border', 'p-3', 'mb-3', 'rounded');
+
+                            card.innerHTML = `
+                                <p><strong>Student:</strong> ${req.student ? req.student.first_name + ' ' + req.student.last_name : 'N/A'}</p>
+                                <p><strong>Reason:</strong> ${req.reason}</p>
+                                <p><strong>Requested Date:</strong> ${req.requested_due_date}</p>
+                                <p><strong>Status:</strong> 
+                                  <span class="badge ${req.status === 'pending' ? 'bg-warning' : (req.status === 'approved' ? 'bg-success' : 'bg-danger')}">${req.status}</span>
+                                </p>
+                                ${req.status === 'pending' ? `
+                                  <button class="btn btn-success btn-sm approveRequest" data-id="${req.id}">Approve</button>
+                                  <button class="btn btn-danger btn-sm denyRequest ms-2" data-id="${req.id}">Deny</button>
+                                ` : ''}
+                            `;
+
+                            container.appendChild(card);
+                        });
+
+                        new bootstrap.Modal(document.getElementById('extensionRequestModal')).show();
+                    } else {
+                        alert('No requests found for this assignment.');
+                    }
+                });
+            }
+        });
+
+        // Approve Request || Deny Request
+        document.getElementById('requestModalBody').addEventListener('click', function(event) {
+            const approveBtn = event.target.closest('.approveRequest');
+            const denyBtn = event.target.closest('.denyRequest');
+
+            if (approveBtn) {
+                const requestId = approveBtn.getAttribute('data-id');
+                handleExtensionAction(requestId, 'approve');
+            }
+
+            if (denyBtn) {
+                const requestId = denyBtn.getAttribute('data-id');
+                handleExtensionAction(requestId, 'deny');
+            }
+        });
+
+        function handleExtensionAction(requestId, action) {
+        fetch(`http://127.0.0.1:8000/api/extension-requests/${requestId}/${action}`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Response:', data); 
+            if (data && data.status === true) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload(); // or re-fetch just the modal content
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message || 'Something went wrong.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Server Error',
+                text: 'An error occurred while processing your request.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
 
 
     });
