@@ -23,8 +23,12 @@ class AssignmentController extends Controller
     public function list()
     {
         try {
-            $assignments = Assignment::with(['user', 'student'])->get();
+            // $assignments = Assignment::with(['user', 'student'])->get();
+            // $assignments = Assignment::with(['student.student', 'extensionRequests.user'])->get();
+            $assignments = Assignment::with(['student.student', 'extensionRequests.user', 'extensionRequests.student'])->get();
+
             return response()->json($assignments);
+            
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -133,10 +137,20 @@ class AssignmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        try {
+            $assignment = Assignment::with(['extensionRequests.student'])->findOrFail($id);
+
+            return response()->json([
+                'status' => true,
+                'extension_requests' => $assignment->extensionRequests
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+        }
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -229,23 +243,20 @@ class AssignmentController extends Controller
 
     public function getAssignmentById($id)
     {
-        $assignment = Assignment::with('user', 'student')->find($id); // loads assignment and user and student
-    
+        $assignment = Assignment::with(['user', 'student.student', 'extensionRequests.user'])->find($id);
+
         if (!$assignment) {
             return response()->json([
                 'status' => false,
                 'message' => 'Assignment not found'
             ], 404);
         }
-        
-        // Add dynamic is_expired field
-        $assignments->each(function ($assignment) {
-            $assignment->is_expired = Carbon::now()->gt(Carbon::parse($assignment->due_date));
-        });
+
         return response()->json([
             'status' => true,
             'assignment' => $assignment,
-            'user' => $assignment->user, //include user
+            'user' => $assignment->user,
+            'extension_requests' => $assignment->extensionRequests // include for frontend
         ], 200);
     }
 
@@ -264,8 +275,40 @@ class AssignmentController extends Controller
         }
     }
 
-   
+    // API Helper
+    function apiResponse($status, $message, $data = [])
+    {
+        return response()->json(array_merge([
+            'status' => $status,
+            'message' => $message,
+        ], $data));
+    }
 
+
+    public function approveExtension($requestId)
+    {
+        $request = AssignmentExtensionRequest::findOrFail($requestId);
+
+        $request->status = 'approved';
+        $request->save();
+
+        // $assignment = $request->assignment;
+        // $assignment->due_date = $request->requested_due_date;
+        // $assignment->save();
+
+        return response()->json(['status' => true, 'message' => 'Extension approved.']);
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function denyExtension($requestId)
+    {
+        $request = AssignmentExtensionRequest::findOrFail($requestId);
+        $request->status = 'rejected';
+        $request->save();
+
+        return response()->json(['status' => true, 'message' => 'Extension rejected.']);
+    }
 
   
 

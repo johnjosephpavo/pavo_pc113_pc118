@@ -53,30 +53,7 @@ class AssignmentsExtensionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function approveExtension($requestId)
-    {
-        $request = AssignmentExtensionRequest::findOrFail($requestId);
-
-        $request->status = 'approved';
-        $request->save();
-
-        $assignment = $request->assignment;
-        $assignment->due_date = $request->requested_due_date;
-        $assignment->save();
-
-        return response()->json(['message' => 'Extension approved.']);
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function denyExtension($requestId)
-    {
-        $request = AssignmentExtensionRequest::findOrFail($requestId);
-        $request->status = 'denied';
-        $request->save();
-
-        return response()->json(['message' => 'Extension denied.']);
-    }
+  
 
     /**
      * Show the form for editing the specified resource.

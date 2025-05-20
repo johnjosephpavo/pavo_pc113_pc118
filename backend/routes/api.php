@@ -77,11 +77,13 @@ use App\Models\AssignmentSubmission;
         Route::get('/get/assignments/{id}', [AssignmentController::class, 'edit']);
         Route::get('/getStudents', [AssignmentController::class, 'getStudents']);
         Route::delete('/delete/assignments/{id}', [AssignmentController::class, 'destroy']);
+        Route::get('/show/assignments/{id}', [AssignmentController::class, 'show']);
+        Route::post('/extension-requests/{id}/approve', [AssignmentController::class, 'approveExtension']);
+        Route::post('/extension-requests/{id}/deny', [AssignmentController::class, 'denyExtension']);
+
 
         // Request Extension //
         Route::post('/assignments/{id}/request-extension', [AssignmentsExtensionController::class, 'requestExtension']);
-        Route::post('/extensions/{id}/approve', [AssignmentsExtensionController::class, 'approveExtension']);
-        Route::post('/extensions/{id}/deny', [AssignmentsExtensionController::class, 'denyExtension']);
     
       
     
