@@ -16,6 +16,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class AuthController extends Controller
 {
@@ -53,7 +56,8 @@ class AuthController extends Controller
         // If role is 2 (Student), also create a Student record
         if ((int) $user->role === 2) {
             try {
-                Student::create([
+                // Create the student record first
+                $student = Student::create([
                     'user_id' => $user->id,
                     'first_name' => $request->input('first_name', ''),
                     'last_name' => $request->input('last_name', ''),
@@ -63,6 +67,22 @@ class AuthController extends Controller
                     'course' => $request->input('course', ''),
                     'contact_number' => $request->input('contact_number', ''),
                 ]);
+
+                // Customize QR Code content (you can use name, ID, etc.)
+                $qrData = "Student ID: {$student->id}\nName: {$student->first_name} {$student->last_name}\nCourse: {$student->course}";
+                $qrFileName = "qr_codes/student_{$student->id}.png";
+                $qrPath = public_path("storage/{$qrFileName}");
+
+                // Generate and save QR Code image
+                $svg = QrCode::format('svg')->size(300)->generate($qrData);
+                file_put_contents($qrPath = public_path("storage/qr_codes/student_{$student->id}.svg"), $svg);
+                // Save the QR code path to the student
+                $student->qr_code = "storage/qr_codes/student_{$student->id}.svg";
+                $student->save();
+                Log::info('Saved QR code to student:', ['qr_code' => $student->qr_code]);
+                // Save the QR code path to the student
+             
+
             } catch (\Exception $e) {
                 Log::error('Failed to create student:', ['error' => $e->getMessage()]);
                 return response()->json([
@@ -75,6 +95,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User created successfully',
+            'qr_code_url' => $student->qr_code ? asset($student->qr_code) : null,
         ]);
     }
 
