@@ -187,6 +187,8 @@ class AuthController extends Controller
                 Log::info("Student record deleted for User ID: {$user->id}");
             }
 
+           
+            
             // Update student details if still a student
             if ($newRole == 2) {
                 try {
@@ -202,6 +204,16 @@ class AuthController extends Controller
                             'contact_number' => $request->input('contact_number', $student->contact_number),
                         ]);
                         Log::info("Student record updated for User ID: {$user->id}");
+                         // Regenerate QR code after update
+                        $qrData = "Student ID: {$student->id}\nName: {$student->first_name} {$student->last_name}\nCourse: {$student->course}";
+                        $qrFilePath = public_path("storage/qr_codes/student_{$student->id}.svg");
+
+                        // Generate QR code SVG and save
+                        $svg = QrCode::format('svg')->size(300)->generate($qrData);
+                        file_put_contents($qrFilePath, $svg);
+
+                        // Update QR code path in student record and save
+                        $student->qr_code = "storage/qr_codes/student_{$student->id}.svg";
                     }
                 } catch (\Throwable $e) {
                     Log::error("Error updating student data for User ID: {$user->id}", ['error' => $e->getMessage()]);
@@ -333,6 +345,14 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'profile_image' => 'nullable|image|max:2048',
+            // Student fields validation
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'age' => 'nullable|integer|min:1|max:150',
+            'gender' => 'nullable|string|max:10',
+            'address' => 'nullable|string|max:500',
+            'course' => 'nullable|string|max:255',
+            'contact_number' => 'nullable|string|max:50',
         ]);
 
         try {
@@ -358,7 +378,7 @@ class AuthController extends Controller
 
             Log::info('User created.', ['user_id' => $user->id]);
 
-            // If Student, create Student record
+            // Create Student record
             $student = Student::create([
                 'user_id' => $user->id,
                 'first_name' => $request->input('first_name', ''),
@@ -372,9 +392,23 @@ class AuthController extends Controller
 
             Log::info('Student record created.', ['student_id' => $student->id]);
 
+            // Generate QR code for new student
+            $qrData = "Student ID: {$student->id}\nName: {$student->first_name} {$student->last_name}\nCourse: {$student->course}";
+            $qrFilePath = public_path("storage/qr_codes/student_{$student->id}.svg");
+
+            $svg = QrCode::format('svg')->size(300)->generate($qrData);
+            file_put_contents($qrFilePath, $svg);
+
+            $student->qr_code = "storage/qr_codes/student_{$student->id}.svg";
+            $student->save();
+
+            Log::info("QR code generated for Student ID: {$student->id}");
+
             return response()->json([
                 'status' => true,
-                'message' => 'User registered successfully'
+                'message' => 'User registered successfully',
+                'user' => $user,
+                'student' => $student,
             ]);
 
         } catch (\Exception $e) {
@@ -385,6 +419,7 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
 
 
     public function sendResetLink(Request $request)
