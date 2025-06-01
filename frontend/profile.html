@@ -466,6 +466,17 @@
 
                 // Insert user details in the profile section
                 document.querySelector('.col-md-8 .row').insertAdjacentHTML('beforeend', userDetails);
+
+                // Add QR code display 
+                if (student.qr_code) {
+                    const qrCodeHtml = `
+                        <div class="col-md-12 mt-4">
+                            <strong>QR Code:</strong><br>
+                            <img src="${backendBaseUrl}/${student.qr_code}" alt="Student QR Code" style="width: 200px; height: 200px;" />
+                        </div>
+                    `;
+                    document.querySelector('.col-md-8 .row').insertAdjacentHTML('beforeend', qrCodeHtml);
+                }
             }
         })
         .catch(error => {
