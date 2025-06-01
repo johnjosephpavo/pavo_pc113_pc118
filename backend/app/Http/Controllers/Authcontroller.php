@@ -64,7 +64,7 @@ class AuthController extends Controller
                     'contact_number' => $request->input('contact_number', ''),
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Failed to create student:', ['error' => $e->getMessage()]);
+                Log::error('Failed to create student:', ['error' => $e->getMessage()]);
                 return response()->json([
                     'status' => false,
                     'message' => 'User created, but failed to create in student table: ' . $e->getMessage(),
@@ -306,7 +306,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        \Log::info('Register request received.', $request->all());
+        Log::info('Register request received.', $request->all());
 
         $validated = $request->validate([
             'email' => 'required|email|unique:users,email',
@@ -318,7 +318,7 @@ class AuthController extends Controller
             // Assign default role (2 for student)
             $validated['role'] = 2;
 
-            \Log::info('Validation successful.', [
+            Log::info('Validation successful.', [
                 'email' => $validated['email'],
                 'role' => $validated['role']
             ]);
@@ -329,13 +329,13 @@ class AuthController extends Controller
                 $path = $request->file('profile_image')->storeAs('profile_images', $filename, 'public');
                 $validated['profile_image'] = $path;
 
-                \Log::info('Profile image uploaded.', ['path' => $path]);
+                Log::info('Profile image uploaded.', ['path' => $path]);
             }
 
             $validated['password'] = bcrypt($validated['password']);
             $user = User::create($validated);
 
-            \Log::info('User created.', ['user_id' => $user->id]);
+            Log::info('User created.', ['user_id' => $user->id]);
 
             // If Student, create Student record
             $student = Student::create([
@@ -349,7 +349,7 @@ class AuthController extends Controller
                 'contact_number' => $request->input('contact_number', ''),
             ]);
 
-            \Log::info('Student record created.', ['student_id' => $student->id]);
+            Log::info('Student record created.', ['student_id' => $student->id]);
 
             return response()->json([
                 'status' => true,
@@ -357,7 +357,7 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Registration Error:', ['error' => $e->getMessage()]);
+            Log::error('Registration Error:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => false,
                 'message' => 'Registration failed: ' . $e->getMessage()
@@ -483,9 +483,9 @@ class AuthController extends Controller
             $mail->Body    = $htmlBody;
 
             $mail->send();
-            \Log::info("Email sent successfully to {$toEmail} with subject: {$subject}");
+            Log::info("Email sent successfully to {$toEmail} with subject: {$subject}");
         } catch (Exception $e) {
-            \Log::error("Email could not be sent to {$toEmail}. Mailer Error: {$mail->ErrorInfo}");
+            Log::error("Email could not be sent to {$toEmail}. Mailer Error: {$mail->ErrorInfo}");
         }
     }
 

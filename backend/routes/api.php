@@ -53,7 +53,7 @@ use App\Models\AssignmentSubmission;
         
         // Users //    
         Route::get('/usersList', [AuthController::class, 'list']); 
-         Route::get('/getUserProfile', [AuthController::class, 'getUserProfile']); 
+        Route::get('/getUserProfile', [AuthController::class, 'getUserProfile']); 
         Route::post('/createusers', [AuthController::class, 'store']);
         Route::get('/get/users/{id}', [AuthController::class, 'edit']);
         Route::get('/getUserById/{id}', [AuthController::class, 'getUserById']);

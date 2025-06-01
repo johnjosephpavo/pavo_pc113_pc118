@@ -126,9 +126,9 @@ class AssignmentController extends Controller
             ";
 
             $mail->send();
-            \Log::info('Assignment email sent to ' . $toEmail);
+            Log::info('Assignment email sent to ' . $toEmail);
         } catch (Exception $e) {
-            \Log::error("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            Log::error("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
         }
     }
 
@@ -309,11 +309,6 @@ class AssignmentController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Extension rejected.']);
     }
-
-  
-
-
-   
 
    
 
